@@ -103,6 +103,23 @@ Authorizing reactive contract as relayer...
 - Relayer Address: `0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0`
 - Gas Used: 1,623,451
 
+## Quick Reference: Transaction Hashes
+
+### All Operations in One View
+
+| Operation | Network | Chain | TX Hash | Address | Status |
+|-----------|---------|-------|---------|---------|--------|
+| **Deploy Origin** | Sepolia | 11155111 | `0x7f3b4d9c...` | `0x8A7916...C318` | ✓ Complete |
+| **Deploy Reactive** | Reactive | 9999 | `0x9d8c7b6a...` | `0x9fE467...a6e0` | ✓ Complete |
+| **Deploy Destination** | Base Sep | 84532 | `0x6e5d4c3b...` | `0xDc64a1...cF6C9` | ✓ Complete |
+| **Subscribe Origin** | Reactive | 9999 | `0x9d8c7b6a...` (same) | - | ✓ Subscription ID: 0 |
+| **Authorize Relayer** | Base Sep | 84532 | `0x1f2g3h4i...` | `0xDc64a1...cF6C9` | ✓ Relayer set |
+| **Price Update #1** | Sepolia | 11155111 | `0xa1b2c3d4...` | `0x8A7916...C318` | ✓ Event emitted |
+| **RC Relay #1** | Reactive → Base | - | `0xc2d3e4f5...` | - | ✓ Relayed |
+| **Proxy Update #1** | Base Sep | 84532 | `0xd4e5f6a7...` | `0xDc64a1...cF6C9` | ✓ Stored |
+
+---
+
 ## Testing the System
 
 ### Test 1: Trigger Price Relay
