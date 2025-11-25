@@ -1,0 +1,83 @@
+# MOC Reactive Workflow Configuration
+# This workflow defines the reactive price feed mirroring system
+
+name: "MOC Price Feed Mirror"
+version: "1.0.0"
+description: "Cross-chain oracle mirroring using Reactive Contracts with Temporal Drift Guards"
+
+networks:
+  origin:
+    name: "Sepolia"
+    chain_id: 11155111
+    rpc_url: "${SEPOLIA_RPC_URL}"
+    contracts:
+      - name: "OriginFeedRelay"
+        address: "${ORIGIN_FEED_RELAY}"
+        events:
+          - "PriceUpdateEmitted(uint80,int256,uint256,uint8,string,bytes32,uint256)"
+          - "TemporalDriftDetected(uint80,uint256,uint256,uint256)"
+  
+  reactive:
+    name: "Reactive Network"
+    chain_id: 9999
+    rpc_url: "${REACTIVE_RPC_URL}"
+    contracts:
+      - name: "PriceFeedReactor"
+        address: "${REACTIVE_CONTRACT}"
+  
+  destination:
+    name: "Base Sepolia"
+    chain_id: 84532
+    rpc_url: "${BASE_SEPOLIA_RPC_URL}"
+    contracts:
+      - name: "DestinationFeedProxy"
+        address: "${DESTINATION_FEED_PROXY}"
+
+subscriptions:
+  - id: "price_update_subscription"
+    origin_chain: 11155111
+    origin_contract: "${ORIGIN_FEED_RELAY}"
+    event_signature: "PriceUpdateEmitted(uint80,int256,uint256,uint8,string,bytes32,uint256)"
+    reactive_contract: "${REACTIVE_CONTRACT}"
+    callback: "react"
+    
+  - id: "drift_detection_subscription"
+    origin_chain: 11155111
+    origin_contract: "${ORIGIN_FEED_RELAY}"
+    event_signature: "TemporalDriftDetected(uint80,uint256,uint256,uint256)"
+    reactive_contract: "${REACTIVE_CONTRACT}"
+    callback: "handleDrift"
+
+relay_configuration:
+  max_retries: 3
+  retry_delay_seconds: 30
+  confidence_threshold: 5000
+  staleness_threshold: 3600
+  batch_size: 1
+  enable_self_healing: true
+  enable_temporal_drift_detection: true
+
+monitoring:
+  enabled: true
+  metrics:
+    - name: "price_updates_relayed"
+      type: "counter"
+    - name: "relay_latency"
+      type: "histogram"
+    - name: "confidence_score"
+      type: "gauge"
+    - name: "temporal_drift"
+      type: "gauge"
+    - name: "failed_relays"
+      type: "counter"
+
+alerts:
+  - name: "high_drift"
+    condition: "temporal_drift > 1000"
+    action: "trigger_self_healing"
+  - name: "low_confidence"
+    condition: "confidence_score < 5000"
+    action: "retry_relay"
+  - name: "relay_failure"
+    condition: "failed_relays > 3"
+    action: "notify_admin"

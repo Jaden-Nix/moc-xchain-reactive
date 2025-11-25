@@ -6,6 +6,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const config: HardhatUserConfig = {
+  analytics: { enabled: false },
   solidity: {
     version: "0.8.20",
     settings: {

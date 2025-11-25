@@ -66,7 +66,7 @@ contract DestinationFeedProxy is AggregatorV3Interface, Ownable, ReentrancyGuard
     error Unauthorized();
     error InvalidRoundId();
     error StaleUpdate();
-    error FeedPaused();
+    error FeedIsPaused();
     error InvalidAnswer();
     error DeviationTooHigh();
 
@@ -78,7 +78,7 @@ contract DestinationFeedProxy is AggregatorV3Interface, Ownable, ReentrancyGuard
     }
 
     modifier whenNotPaused() {
-        if (feedConfig.paused) revert FeedPaused();
+        if (feedConfig.paused) revert FeedIsPaused();
         _;
     }
 
