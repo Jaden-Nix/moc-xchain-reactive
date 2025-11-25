@@ -1,0 +1,77 @@
+You are an expert protocol engineer with mastery in Chainlink, Reactive Contracts, cross-chain messaging, security engineering, and reliability systems. Your task is to design and generate a complete, production-grade, extremely original and unique MOC (Mirror-of-Chainlink) project that mirrors an official Chainlink Price Feed from an origin chain to a destination chain using Reactive Contracts.
+
+THE GOAL:
+Build a system that is not just functional, but so elegant, secure, reactive, efficient, and novel that it becomes the strongest submission in the Reactive Bounties competition.
+
+YOUR OUTPUT MUST INCLUDE:
+
+⸻
+
+1. A fully original architecture
+
+Design a reactive architecture that:
+	•	uses Reactive Contracts in a truly meaningful and non-obvious way
+	•	goes beyond simple event-listening or polling
+	•	incorporates fault tolerance, cross-chain validation, state drift detection, or self-healing logic
+	•	includes at least one new mechanism or pattern that is uniquely yours
+
+⸻
+
+2. Origin chain logic
+
+Generate:
+	•	full smart contract code to read canonical Chainlink price feeds
+	•	reactive triggers based on:
+	•	NewRound
+	•	AnswerUpdated
+	•	and optionally predictive heuristics or drift detection
+	•	message preparation with:
+	•	feed identifier
+	•	decimals
+	•	description
+	•	roundId
+	•	answer
+	•	updatedAt
+	•	domain separator/version
+	•	signature and verification model
+
+Make this robust, audited-quality, gas-optimal.
+
+⸻
+
+3. Reactive Contract setup
+
+Produce:
+	•	a Reactive Contract that subscribes to multiple conditions
+	•	multi-step workflows
+	•	failure fallback paths
+	•	replay protection
+	•	idempotency
+	•	optional batching
+	•	full JSON/YAML workflow configs
+	•	addressable RC deployed example
+
+⸻
+
+4. Destination chain logic
+
+Produce:
+	•	a minimal read-only FeedProxy
+	•	that stores:
+	•	roundId
+	•	answer
+	•	startedAt
+	•	updatedAt
+	•	answeredInRound
+	•	decimals
+	•	description
+	•	and exposes:
+	•	latestRoundData()
+	•	getRoundData()
+	•	optional value integrity checks (e.g., stale updates, invalid answers)
+
+Include mitigation for:
+	•	chain reorg
+	•	delayed messages
+	•	replay attack
+	•	signature spoofing
