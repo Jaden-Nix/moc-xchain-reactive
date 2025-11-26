@@ -65,6 +65,7 @@ contract OriginFeedRelay is Ownable, ReentrancyGuard {
     error StaleUpdate();
     error InvalidRoundId();
     error UpdateTooFrequent();
+    error InvalidPrice();
 
     constructor(
         address _priceFeed,
@@ -101,6 +102,7 @@ contract OriginFeedRelay is Ownable, ReentrancyGuard {
         
         if (roundId <= latestRoundId) revert InvalidRoundId();
         if (updatedAt == 0) revert StaleUpdate();
+        if (answer <= 0) revert InvalidPrice();
         if (block.timestamp < feedMetadata.lastUpdateTimestamp + minUpdateInterval) {
             revert UpdateTooFrequent();
         }

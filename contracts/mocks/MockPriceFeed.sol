@@ -28,8 +28,10 @@ contract MockPriceFeed is AggregatorV3Interface {
     
     /**
      * @notice Set mock price for testing
+     * @dev Rejects zero or negative prices to prevent breaking downstream calculations
      */
     function setPrice(int256 _price) external {
+        require(_price > 0, "MockPriceFeed: Price must be greater than 0");
         mockPrice = _price;
         roundId += 1;
         lastUpdateTime = block.timestamp;
