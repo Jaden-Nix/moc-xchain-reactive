@@ -30,15 +30,15 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 84532,
     },
-    kopli: {
-      url: process.env.REACTIVE_RPC_URL || "https://kopli-rpc.rkt.ink",
+    lasna: {
+      url: process.env.REACTIVE_RPC_URL || "https://lasna-rpc.rkt.ink",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 5318008,
+      chainId: 2024,
     },
     reactive: {
-      url: process.env.REACTIVE_RPC_URL || "https://kopli-rpc.rkt.ink",
+      url: process.env.REACTIVE_RPC_URL || "https://lasna-rpc.rkt.ink",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 5318008,
+      chainId: 2024,
     },
   },
   etherscan: {
