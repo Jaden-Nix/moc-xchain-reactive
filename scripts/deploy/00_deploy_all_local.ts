@@ -15,22 +15,31 @@ async function main() {
   console.log("🔑 Deployer:", deployer.address);
   console.log("💰 Balance:", ethers.formatEther(await ethers.provider.getBalance(deployer.address)), "ETH\n");
 
-  // Deploy Origin Feed Relay
+  // Deploy Mock Price Feed first
   console.log("─".repeat(70));
+  console.log("STEP 0: Deploying Mock Chainlink Price Feed");
+  console.log("─".repeat(70));
+
+  const MockPriceFeed = await ethers.getContractFactory("MockPriceFeed");
+  const mockFeed = await MockPriceFeed.deploy("ETH/USD", 8);
+  await mockFeed.waitForDeployment();
+  const mockFeedAddress = await mockFeed.getAddress();
+  console.log("✅ Mock Price Feed deployed to:", mockFeedAddress);
+
+  // Deploy Origin Feed Relay
+  console.log("\n" + "─".repeat(70));
   console.log("STEP 1: Deploying OriginFeedRelay");
   console.log("─".repeat(70));
 
   const OriginFeedRelay = await ethers.getContractFactory("OriginFeedRelay");
   
-  // Use a mock price feed address for local testing
-  const mockPriceFeed = deployer.address; // Just use deployer as placeholder
   const feedDescription = "ETH/USD Price Feed Relay";
 
   console.log("Deploying OriginFeedRelay with:");
-  console.log("  - Price Feed (mock):", mockPriceFeed);
+  console.log("  - Price Feed (mock):", mockFeedAddress);
   console.log("  - Description:", feedDescription);
 
-  const originRelay = await OriginFeedRelay.deploy(mockPriceFeed, feedDescription);
+  const originRelay = await OriginFeedRelay.deploy(mockFeedAddress, feedDescription);
   await originRelay.waitForDeployment();
   const originAddress = await originRelay.getAddress();
   console.log("✅ OriginFeedRelay deployed to:", originAddress);
@@ -90,10 +99,11 @@ async function main() {
   const deploymentInfo = {
     network: {
       name: (await ethers.provider.getNetwork()).name,
-      chainId: chainId,
+      chainId: Number(chainId),
     },
     deployer: deployer.address,
     contracts: {
+      MockPriceFeed: mockFeedAddress,
       OriginFeedRelay: originAddress,
       PriceFeedReactor: reactorAddress,
       DestinationFeedProxy: proxyAddress,
