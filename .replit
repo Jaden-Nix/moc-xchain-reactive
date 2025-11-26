@@ -14,6 +14,10 @@ author = "agent"
 task = "workflow.run"
 args = "Compile Contracts"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Local Blockchain Node"
+
 [[workflows.workflow]]
 name = "Compile Contracts"
 author = "agent"
@@ -24,6 +28,14 @@ args = "npx hardhat compile"
 
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow]]
+name = "Local Blockchain Node"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx hardhat node"
 
 [[ports]]
 localPort = 8545
