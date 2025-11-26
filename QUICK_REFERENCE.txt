@@ -1,0 +1,36 @@
+=======================================================================
+DEPLOYMENT QUICK REFERENCE - Copy Exact Commands Below
+=======================================================================
+
+YOUR WALLET: 0x9Fa915353AA1e8F955f76D3a39497B8f1F38a273
+YOUR BALANCE: 0.2 SepETH ✅
+
+NETWORK INFO:
+- Sepolia RPC: https://rpc.sepolia.org (Chain 11155111)
+- Lasna RPC: https://lasna-rpc.rkt.ink (Chain 2024)
+
+COMMAND 1: Deploy to Sepolia
+------------------------------
+npx hardhat run scripts/deploy/01_deploy_origin_sepolia.ts --network sepolia
+
+COMMAND 2: Deploy to Lasna (replace addresses from Command 1)
+------------------------------
+npx hardhat run scripts/deploy/02_deploy_reactive_lasna.ts --network lasna \
+  0x[MOCK_FEED_FROM_CMD_1] \
+  0x[ORIGIN_RELAY_FROM_CMD_1]
+
+COMMAND 3: Test Workflow (use addresses from Command 1)
+------------------------------
+npx hardhat run scripts/test/workflow-cross-chain.ts --network sepolia \
+  0x[MOCK_FEED_FROM_CMD_1] \
+  0x[ORIGIN_RELAY_FROM_CMD_1]
+
+SAVE ALL ADDRESSES & TX HASHES IN:
+→ SUBMISSION_CHECKLIST.md
+
+EXPLORER LINKS:
+- Sepolia: https://sepolia.etherscan.io
+- Lasna: https://lasna-scan.rkt.ink
+
+YOU'RE READY TO GO!
+=======================================================================
