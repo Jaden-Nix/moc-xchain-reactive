@@ -30,10 +30,15 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 84532,
     },
-    reactive: {
-      url: process.env.REACTIVE_RPC_URL || "https://reactive.rpc.example.com",
+    kopli: {
+      url: process.env.REACTIVE_RPC_URL || "https://kopli-rpc.rkt.ink",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 9999,
+      chainId: 5318008,
+    },
+    reactive: {
+      url: process.env.REACTIVE_RPC_URL || "https://kopli-rpc.rkt.ink",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 5318008,
     },
   },
   etherscan: {
