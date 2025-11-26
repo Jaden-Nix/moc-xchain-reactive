@@ -110,6 +110,7 @@ contract DestinationFeedProxy is AggregatorV3Interface, Ownable, ReentrancyGuard
         if (_roundId <= latestRound) revert InvalidRoundId();
         if (_answer <= 0) revert InvalidAnswer();
         if (_decimals != feedConfig.decimals) revert InvalidAnswer();
+        if (block.timestamp - _updatedAt > feedConfig.stalenessThreshold) revert InvalidAnswer();
         
         if (latestRound > 0) {
             _validateUpdate(_roundId, _answer);

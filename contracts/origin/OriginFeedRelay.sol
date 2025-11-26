@@ -103,6 +103,7 @@ contract OriginFeedRelay is Ownable, ReentrancyGuard {
         if (roundId <= latestRoundId) revert InvalidRoundId();
         if (updatedAt == 0) revert StaleUpdate();
         if (answer <= 0) revert InvalidPrice();
+        if (block.timestamp - updatedAt > STALENESS_THRESHOLD) revert StaleUpdate();
         if (block.timestamp < feedMetadata.lastUpdateTimestamp + minUpdateInterval) {
             revert UpdateTooFrequent();
         }
