@@ -24,3 +24,7 @@ args = "npx hardhat compile"
 
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[ports]]
+localPort = 8545
+externalPort = 80
