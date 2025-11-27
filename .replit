@@ -18,6 +18,10 @@ args = "Compile Contracts"
 task = "workflow.run"
 args = "Local Blockchain Node"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Dashboard UI"
+
 [[workflows.workflow]]
 name = "Compile Contracts"
 author = "agent"
@@ -37,6 +41,22 @@ author = "agent"
 task = "shell.exec"
 args = "npx hardhat node"
 
+[[workflows.workflow]]
+name = "Dashboard UI"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[ports]]
 localPort = 8545
+externalPort = 80
+
+[[ports]]
+localPort = 5000
 externalPort = 80
