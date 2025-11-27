@@ -8,6 +8,7 @@ export default defineConfig({
     port: 5000,
     strictPort: false,
     middlewareMode: false,
+    allowedHosts: true,
   },
   preview: {
     host: '0.0.0.0',
