@@ -4,7 +4,9 @@
   "description": "Mirror-of-Chainlink: Cross-chain oracle mirroring using Reactive Contracts with Temporal Drift Guards",
   "main": "index.js",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 5000",
+    "dev": "concurrently \"node api.js\" \"vite --host 0.0.0.0 --port 5000\"",
+    "api": "node api.js",
+    "dev:ui-only": "vite --host 0.0.0.0 --port 5000",
     "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy:origin": "hardhat run scripts/deploy/01_deploy_origin.ts --network sepolia",
@@ -47,8 +49,11 @@
   "dependencies": {
     "@chainlink/contracts": "^0.8.0",
     "@openzeppelin/contracts": "^5.0.1",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "ethers": "^6.9.2",
+    "express": "^5.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "vite": "^7.2.4"

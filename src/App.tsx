@@ -11,6 +11,7 @@ import {
   deployContracts,
   getLocalProvider,
 } from './contractInteraction'
+import TerminalViewer from './TerminalViewer'
 
 interface DeploymentInfo {
   sepolia: {
@@ -50,6 +51,7 @@ const App: React.FC = () => {
   const [connectionError, setConnectionError] = useState<string | null>(null)
   const [isDeploying, setIsDeploying] = useState(false)
   const [deploymentMode, setDeploymentMode] = useState<'local' | 'testnet'>('testnet')
+  const [terminalOpen, setTerminalOpen] = useState(false)
 
   useEffect(() => {
     // Initialize with deployment data
@@ -545,11 +547,32 @@ const App: React.FC = () => {
       )}
 
       <footer>
-        <p>Cross-Chain Price Relay • Hackathon Submission • Reactive Contracts</p>
-        <p style={{ fontSize: '0.875rem', marginTop: '0.5rem', color: '#64748b' }}>
-          {deploymentMode === 'local' ? '🖥️ Local Testing' : '🌐 Testnet View'}
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <p>Cross-Chain Price Relay • Hackathon Submission • Reactive Contracts</p>
+            <p style={{ fontSize: '0.875rem', marginTop: '0.5rem', color: '#64748b' }}>
+              {deploymentMode === 'local' ? '🖥️ Local Testing' : '🌐 Testnet View'}
+            </p>
+          </div>
+          <button
+            onClick={() => setTerminalOpen(!terminalOpen)}
+            style={{
+              padding: '0.5rem 1rem',
+              background: terminalOpen ? '#ef4444' : '#64748b',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '0.25rem',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+              marginRight: '1rem',
+            }}
+          >
+            {terminalOpen ? '✕ Close Terminal' : '▶ Open Terminal'}
+          </button>
+        </div>
       </footer>
+
+      <TerminalViewer isOpen={terminalOpen} onClose={() => setTerminalOpen(false)} />
     </div>
   )
 }
