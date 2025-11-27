@@ -11,14 +11,14 @@ async function main() {
   console.log(`Chain ID: ${network.chainId}`);
   console.log(`Deployer: ${deployer.address}\n`);
 
-  // Get Origin contract addresses from environment or args
-  const mockFeedAddr = process.argv[2] || "0x0000000000000000000000000000000000000000";
-  const originRelayAddr = process.argv[3] || "0x0000000000000000000000000000000000000000";
+  // Get Origin contract addresses from environment
+  const mockFeedAddr = process.env.MOCK_FEED_ADDR || "0x0000000000000000000000000000000000000000";
+  const originRelayAddr = process.env.ORIGIN_RELAY_ADDR || "0x0000000000000000000000000000000000000000";
   const sepoliaChainId = 11155111;
 
   if (mockFeedAddr === "0x0000000000000000000000000000000000000000") {
-    console.error("❌ ERROR: Must pass MockPriceFeed and OriginRelay addresses");
-    console.error("Usage: npx hardhat run scripts/deploy/02_deploy_reactive_lasna.ts --network lasna <mockFeedAddr> <originRelayAddr>\n");
+    console.error("❌ ERROR: Must set environment variables:");
+    console.error("Usage: MOCK_FEED_ADDR=0x... ORIGIN_RELAY_ADDR=0x... npx hardhat run scripts/deploy/02_deploy_reactive_lasna.ts --network lasna\n");
     process.exit(1);
   }
 
