@@ -21,9 +21,10 @@ const config: HardhatUserConfig = {
       chainId: 31337,
     },
     sepolia: {
-      url: process.env.SEPOLIA_RPC_URL || "https://rpc.sepolia.org",
+      url: process.env.SEPOLIA_RPC_URL || "https://eth-sepolia.g.alchemy.com/v2/demo",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 11155111,
+      timeout: 120000,
     },
     baseSepolia: {
       url: process.env.BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org",
@@ -34,11 +35,13 @@ const config: HardhatUserConfig = {
       url: process.env.REACTIVE_RPC_URL || "https://lasna-rpc.rkt.ink",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 2024,
+      timeout: 120000,
     },
     reactive: {
       url: process.env.REACTIVE_RPC_URL || "https://lasna-rpc.rkt.ink",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 2024,
+      timeout: 120000,
     },
   },
   etherscan: {

@@ -1,0 +1,2 @@
+❌ HH110: Invalid JSON-RPC response received: project ID does not have access to this network, see https://infura.io/dashboard
+
