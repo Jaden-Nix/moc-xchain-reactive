@@ -29,10 +29,23 @@ interface ContractResult {
 }
 
 export async function getProvider(): Promise<BrowserProvider> {
-  // Connect to local Hardhat node
-  return new ethers.BrowserProvider(
-    new ethers.JsonRpcProvider('http://127.0.0.1:8545')
-  )
+  // Get domain from environment or use fallback
+  const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  const domain = window.location.hostname === 'localhost' 
+    ? 'http://127.0.0.1:8545'
+    : `http://${window.location.hostname}:8545`
+  
+  try {
+    const provider = new ethers.JsonRpcProvider(domain)
+    // Test connection
+    await provider.getNetwork()
+    return new ethers.BrowserProvider(
+      new ethers.JsonRpc(domain)
+    )
+  } catch (error) {
+    console.error('Failed to connect to Hardhat node at', domain, error)
+    throw new Error(`Cannot connect to blockchain at ${domain}. Make sure the Hardhat node is running.`)
+  }
 }
 
 export async function getSigner() {

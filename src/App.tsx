@@ -45,6 +45,7 @@ const App: React.FC = () => {
 
   const [testResults, setTestResults] = useState<TestResult[]>([])
   const [activeTab, setActiveTab] = useState<'info' | 'test'>('info')
+  const [connectionError, setConnectionError] = useState<string | null>(null)
 
   useEffect(() => {
     // Load deployment data
@@ -301,6 +302,12 @@ const App: React.FC = () => {
 
       {activeTab === 'test' && (
         <section className="test-section">
+          {connectionError && (
+            <div className="connection-error">
+              <strong>⚠️ Connection Issue:</strong> {connectionError}
+            </div>
+          )}
+          
           <h2>🧪 Interactive Contract Testing</h2>
           <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>
             Test contracts on local blockchain (Hardhat). Watch prices flow through the
