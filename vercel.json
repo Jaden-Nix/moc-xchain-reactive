@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:vercel",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "env": {
     "NODE_ENV": "production"
   },
   "functions": {
-    "api.js": {
+    "api/index.js": {
       "memory": 1024,
       "maxDuration": 300
     }
@@ -14,7 +14,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "api.js"
+      "destination": "/api"
     },
     {
       "source": "/(.*)",
