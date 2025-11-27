@@ -54,9 +54,13 @@ waitForPort = 5000
 outputType = "webview"
 
 [[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
 localPort = 8545
 externalPort = 80
 
 [[ports]]
-localPort = 5000
-externalPort = 80
+localPort = 42055
+externalPort = 3000

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { ethers } from 'ethers'
 
 interface DeploymentInfo {
   sepolia: {
@@ -163,6 +162,8 @@ const App: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <div className="arrow">↓</div>
 
       <section className="requirements">
         <h2>✅ Requirements Verification</h2>
