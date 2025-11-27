@@ -36,7 +36,7 @@ interface DeployedContracts {
 }
 
 const RPC_ENDPOINTS = {
-  sepolia: 'https://eth-sepolia.g.alchemy.com/v2/demo',
+  sepolia: 'https://rpc.sepolia.org',
   lasna: 'https://lasna-rpc.rnk.dev',
   local: 'http://127.0.0.1:8545',
 }
