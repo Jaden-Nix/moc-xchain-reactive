@@ -8,8 +8,9 @@ import {
   testDestinationUpdate,
   testReadDestinationPrice,
   testStalenessCheck,
-  deployContracts,
-  getLocalProvider,
+  connectWallet,
+  getWalletAddress,
+  isWalletAvailable,
 } from './contractInteraction'
 import TerminalViewer from './TerminalViewer'
 
@@ -52,11 +53,29 @@ const App: React.FC = () => {
   const [isDeploying, setIsDeploying] = useState(false)
   const [deploymentMode, setDeploymentMode] = useState<'local' | 'testnet'>('testnet')
   const [terminalOpen, setTerminalOpen] = useState(false)
+  const [walletAddress, setWalletAddress] = useState<string | null>(null)
+  const [isConnecting, setIsConnecting] = useState(false)
 
   useEffect(() => {
-    // Initialize with deployment data
     initializeDeployment()
+    checkWalletConnection()
   }, [deploymentMode])
+
+  const checkWalletConnection = async () => {
+    const address = await getWalletAddress()
+    setWalletAddress(address)
+  }
+
+  const handleConnectWallet = async () => {
+    setIsConnecting(true)
+    const result = await connectWallet()
+    if (result.success && result.address) {
+      setWalletAddress(result.address)
+    } else {
+      setConnectionError(result.error || 'Failed to connect wallet')
+    }
+    setIsConnecting(false)
+  }
 
   const initializeDeployment = async () => {
     try {
@@ -166,39 +185,52 @@ const App: React.FC = () => {
       <header>
         <h1>🔗 Cross-Chain Price Relay</h1>
         <p style={{ color: '#94a3b8', marginTop: '0.5rem' }}>
-          Reactive Contracts | Local Hardhat Network
+          Reactive Contracts | Sepolia & Lasna Testnets
         </p>
-        <div className="status-badge">✅ Local Testing Ready</div>
-        <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-          <button
-            className={`mode-btn ${deploymentMode === 'local' ? 'active' : ''}`}
-            onClick={() => setDeploymentMode('local')}
-            style={{
-              padding: '0.5rem 1rem',
-              border: `2px solid ${deploymentMode === 'local' ? '#00ff00' : '#64748b'}`,
-              background: deploymentMode === 'local' ? '#1e3a1f' : '#0f172a',
-              color: '#cbd5e1',
-              borderRadius: '0.25rem',
-              cursor: 'pointer',
-            }}
-          >
-            📦 Local Deployment
-          </button>
-          <button
-            className={`mode-btn ${deploymentMode === 'testnet' ? 'active' : ''}`}
-            onClick={() => setDeploymentMode('testnet')}
-            style={{
-              padding: '0.5rem 1rem',
-              border: `2px solid ${deploymentMode === 'testnet' ? '#00ff00' : '#64748b'}`,
-              background: deploymentMode === 'testnet' ? '#1e3a1f' : '#0f172a',
-              color: '#cbd5e1',
-              borderRadius: '0.25rem',
-              cursor: 'pointer',
-            }}
-          >
-            🌐 Testnet View
-          </button>
+        <div className="status-badge">
+          {walletAddress 
+            ? `🦊 ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` 
+            : '🌐 Testnet Mode'}
         </div>
+        
+        <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          {!walletAddress ? (
+            <button
+              onClick={handleConnectWallet}
+              disabled={isConnecting}
+              style={{
+                padding: '0.5rem 1.5rem',
+                border: '2px solid #f97316',
+                background: '#7c2d12',
+                color: '#fff',
+                borderRadius: '0.25rem',
+                cursor: isConnecting ? 'not-allowed' : 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              {isConnecting ? 'Connecting...' : '🦊 Connect Wallet'}
+            </button>
+          ) : (
+            <button
+              style={{
+                padding: '0.5rem 1rem',
+                border: '2px solid #22c55e',
+                background: '#14532d',
+                color: '#fff',
+                borderRadius: '0.25rem',
+                cursor: 'default',
+              }}
+            >
+              Wallet Connected
+            </button>
+          )}
+        </div>
+
+        <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '0.5rem' }}>
+          {walletAddress 
+            ? 'Write operations use your wallet. Read operations work without wallet.' 
+            : 'Connect wallet for write operations (update price, relay, etc.)'}
+        </p>
       </header>
 
       {/* Tab Navigation */}
@@ -389,9 +421,10 @@ const App: React.FC = () => {
           
           <h2>🧪 Interactive Contract Testing</h2>
           <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>
-            {deploymentMode === 'local'
-              ? 'Test contracts on local Hardhat blockchain. All operations execute immediately.'
-              : 'Test contracts on live testnets (read-only). Use MetaMask for write operations.'}
+            Test your deployed contracts on Sepolia and Lasna testnets. 
+            {walletAddress 
+              ? ' Your wallet is connected for write operations.' 
+              : ' Connect your wallet for write operations (update price, relay, etc.).'}
           </p>
 
           <div className="test-grid">
@@ -551,7 +584,7 @@ const App: React.FC = () => {
           <div>
             <p>Cross-Chain Price Relay • Hackathon Submission • Reactive Contracts</p>
             <p style={{ fontSize: '0.875rem', marginTop: '0.5rem', color: '#64748b' }}>
-              {deploymentMode === 'local' ? '🖥️ Local Testing' : '🌐 Testnet View'}
+              🌐 Sepolia & Lasna Testnets
             </p>
           </div>
           <button
