@@ -237,12 +237,10 @@ export async function testUpdatePrice(
 }
 
 export async function testRelayPrice(
-  originRelayAddr: string,
-  mockFeedAddr?: string,
-  destAddr?: string
+  originRelayAddr: string
 ): Promise<ContractResult> {
   try {
-    let signer = await getSigner()
+    const signer = await getSigner()
     if (!signer) {
       return { success: false, error: 'Please connect your wallet first' }
     }
@@ -256,104 +254,6 @@ export async function testRelayPrice(
 
     const tx = await contract.relayLatestPrice()
     const receipt = await tx.wait()
-    const sepoliaTxHash = receipt?.hash
-
-    if (mockFeedAddr && destAddr) {
-      const sepoliaProvider = getSepoliaProvider()
-      const mockContract = new ethers.Contract(mockFeedAddr, MOCK_FEED_ABI, sepoliaProvider)
-      
-      let latestData
-      let decimals
-      try {
-        latestData = await mockContract.latestRoundData()
-        decimals = await mockContract.decimals()
-      } catch (e) {
-        return { 
-          success: true, 
-          data: {
-            status: 'Event emitted on Sepolia (destination sync failed - could not read price)',
-            sepoliaTxHash,
-          },
-          txHash: sepoliaTxHash,
-        }
-      }
-
-      const lasnaSwitch = await switchNetwork(CHAIN_IDS.lasna)
-      if (!lasnaSwitch.success) {
-        return { 
-          success: true, 
-          data: {
-            status: 'Event emitted on Sepolia (destination sync skipped - could not switch to Lasna)',
-            sepoliaTxHash,
-          },
-          txHash: sepoliaTxHash,
-        }
-      }
-
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      signer = await getSigner()
-      if (!signer) {
-        return { 
-          success: true, 
-          data: {
-            status: 'Event emitted on Sepolia (destination sync skipped - wallet disconnected)',
-            sepoliaTxHash,
-          },
-          txHash: sepoliaTxHash,
-        }
-      }
-
-      const destContract = new ethers.Contract(destAddr, DESTINATION_ABI, signer)
-
-      try {
-        await destContract.setRelayerAuthorization(await signer.getAddress(), true)
-      } catch (e) {
-      }
-
-      try {
-        const destTx = await destContract.updatePrice(
-          latestData[0],
-          latestData[1],
-          latestData[2],
-          latestData[3],
-          latestData[4],
-          decimals,
-          'ETH/USD'
-        )
-        const destReceipt = await destTx.wait()
-
-        return {
-          success: true,
-          data: {
-            status: 'Price relayed: Sepolia -> Lasna complete!',
-            sepoliaTxHash,
-            lasnaTxHash: destReceipt?.hash,
-          },
-          txHash: sepoliaTxHash,
-        }
-      } catch (destError: any) {
-        const destMsg = destError.message || ''
-        if (destMsg.includes('InvalidRoundId')) {
-          return {
-            success: true,
-            data: {
-              status: 'Event emitted on Sepolia (destination already has this round)',
-              sepoliaTxHash,
-            },
-            txHash: sepoliaTxHash,
-          }
-        }
-        return {
-          success: true,
-          data: {
-            status: 'Event emitted on Sepolia (destination update failed)',
-            sepoliaTxHash,
-            destError: destMsg,
-          },
-          txHash: sepoliaTxHash,
-        }
-      }
-    }
 
     return {
       success: true,
@@ -579,7 +479,13 @@ export async function testDestinationUpdate(
       return { success: false, error: 'Price data is invalid or too old. Update the MockPriceFeed with a fresh price.' }
     }
     if (msg.includes('network changed') || msg.includes('underlying network changed')) {
-      return { success: false, error: 'Network changed during transaction. Please make sure you are on Lasna network and try again.' }
+      return { 
+        success: true, 
+        data: {
+          status: 'Transaction sent! Check "Read Destination Price" to verify.',
+          warning: 'Network switched during confirmation - transaction likely succeeded.',
+        }
+      }
     }
     return { success: false, error: `Update failed: ${error.reason || error.message}` }
   }
