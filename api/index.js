@@ -20,6 +20,7 @@ const ALLOWED_COMMANDS = [
   'npm run format',
   'npx hardhat compile',
   'npx hardhat test',
+  'npx hardhat run',
   'npm list',
   'node --version',
   'npm --version',
