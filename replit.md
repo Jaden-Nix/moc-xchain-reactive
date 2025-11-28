@@ -84,9 +84,10 @@ npx hardhat run scripts/test/simulate_attack.js --network hardhat
 - ✅ Check staleness on destination
 - ✅ Test edge cases (zero price, negative price)
 
-### Security Event Log
-- ✅ Real-time monitoring table showing blocked vs relayed events
-- ✅ Red "BLOCKED" rows for rejected attacks
+### Security Event Log (LIVE)
+- ✅ **"Run Attack Simulation" button** - Runs 4 attacks against the contract
+- ✅ Real-time table updates showing blocked vs relayed events
+- ✅ Red "BLOCKED" rows for rejected attacks with error reasons
 - ✅ Green "RELAYED" rows for valid price updates
 - ✅ Summary stats: Attacks Blocked, Valid Relays, Threat Detection %
 
