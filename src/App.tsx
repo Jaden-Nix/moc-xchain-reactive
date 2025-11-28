@@ -538,7 +538,11 @@ const App: React.FC = () => {
                 className="test-btn secondary"
                 onClick={() =>
                   runTest('Relay Price from Origin', () =>
-                    testRelayPrice(data.deployment.sepolia.originRelay)
+                    testRelayPrice(
+                      data.deployment.sepolia.originRelay,
+                      data.deployment.sepolia.mockFeed,
+                      data.deployment.lasna.destination
+                    )
                   )
                 }
               >
