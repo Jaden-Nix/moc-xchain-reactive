@@ -133,6 +133,105 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// Attack simulation endpoint - returns structured JSON for Security Event Log
+app.post('/api/attack-simulation', (req, res) => {
+  const events = [];
+  let output = '';
+  
+  const childProcess = exec(
+    'npx hardhat run scripts/test/simulate_attack.js --network hardhat',
+    { cwd: process.cwd(), maxBuffer: 1024 * 1024 * 10 }
+  );
+
+  if (childProcess.stdout) {
+    childProcess.stdout.on('data', (data) => {
+      output += data;
+    });
+  }
+
+  if (childProcess.stderr) {
+    childProcess.stderr.on('data', (data) => {
+      output += data;
+    });
+  }
+
+  childProcess.on('close', (code) => {
+    const now = new Date();
+    const timestamp = now.toISOString().replace('T', ' ').substring(0, 19);
+    
+    // Parse the output and create structured events
+    if (output.includes('THE BLACK HOLE')) {
+      events.push({
+        id: Date.now() + 1,
+        timestamp,
+        type: 'Zero Price Injection',
+        details: 'Attempted $0 price update',
+        status: output.includes('ATTACK 1') && output.includes('REJECTED') ? 'blocked' : 'failed',
+        reason: 'InvalidAnswer()'
+      });
+    }
+    
+    if (output.includes('THE NEGATOR')) {
+      events.push({
+        id: Date.now() + 2,
+        timestamp,
+        type: 'Negative Price',
+        details: 'Attempted -$500 injection',
+        status: output.includes('ATTACK 2') && output.includes('REJECTED') ? 'blocked' : 'failed',
+        reason: 'InvalidAnswer()'
+      });
+    }
+    
+    if (output.includes('THE FLASH CRASH')) {
+      events.push({
+        id: Date.now() + 3,
+        timestamp,
+        type: 'Flash Crash',
+        details: '99% deviation detected ($2000→$20)',
+        status: output.includes('ATTACK 3') && output.includes('REJECTED') ? 'blocked' : 'failed',
+        reason: 'DeviationTooHigh()'
+      });
+    }
+    
+    if (output.includes('THE ZOMBIE')) {
+      events.push({
+        id: Date.now() + 4,
+        timestamp,
+        type: 'Replay Attack',
+        details: 'Stale roundId: 50 (already processed)',
+        status: output.includes('ATTACK 4') && output.includes('REJECTED') ? 'blocked' : 'failed',
+        reason: 'InvalidRoundId()'
+      });
+    }
+
+    const attacksBlocked = events.filter(e => e.status === 'blocked').length;
+    
+    res.json({
+      success: code === 0,
+      events,
+      summary: {
+        total: events.length,
+        blocked: attacksBlocked,
+        passed: 0
+      },
+      rawOutput: output
+    });
+  });
+
+  childProcess.on('error', (error) => {
+    res.status(500).json({ error: error.message });
+  });
+
+  const timeout = setTimeout(() => {
+    childProcess.kill();
+    res.status(504).json({ error: 'Attack simulation timed out' });
+  }, 120000);
+
+  res.on('close', () => {
+    clearTimeout(timeout);
+  });
+});
+
 app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
