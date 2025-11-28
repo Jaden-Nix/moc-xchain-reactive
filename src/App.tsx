@@ -100,8 +100,9 @@ const App: React.FC = () => {
       const data = await response.json()
       
       if (data.events && data.events.length > 0) {
-        setSecurityEvents(prev => [...data.events, ...prev])
-        setAttacksBlocked(prev => prev + data.summary.blocked)
+        setSecurityEvents(data.events)
+        setAttacksBlocked(data.summary.blocked)
+        setValidRelays(data.summary.passed || 0)
       }
     } catch (error) {
       console.error('Attack simulation failed:', error)
