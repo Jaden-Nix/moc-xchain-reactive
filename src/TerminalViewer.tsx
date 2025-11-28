@@ -22,7 +22,7 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
-      inputRef.current.focus()
+      setTimeout(() => inputRef.current?.focus(), 100)
     }
   }, [isOpen])
 
@@ -106,7 +106,7 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
   }
 
   const runTests = async () => {
-    runCommand('npm run test')
+    await runCommand('npm run test')
   }
 
   if (!isOpen) return null
@@ -126,6 +126,11 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
         zIndex: 1000,
         fontFamily: 'Courier New, monospace',
       }}
+      onClick={(e) => {
+        if (inputRef.current && e.target === e.currentTarget) {
+          inputRef.current.focus()
+        }
+      }}
     >
       <div
         style={{
@@ -135,6 +140,7 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           borderBottom: '1px solid #475569',
+          flexShrink: 0,
         }}
       >
         <span style={{ color: '#cbd5e1', fontWeight: 'bold' }}>Terminal</span>
@@ -197,13 +203,14 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
           lineHeight: '1.5',
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
+          minHeight: '200px',
         }}
       >
         {output.length === 0 ? (
           <div style={{ color: '#64748b' }}>Type a command and press Enter...</div>
         ) : (
           output.map((line, idx) => (
-            <div key={idx}>
+            <div key={idx} style={{ margin: '0', padding: '0' }}>
               {line || '\n'}
             </div>
           ))
@@ -213,14 +220,17 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
       <div
         style={{
           borderTop: '1px solid #475569',
-          padding: '0.75rem',
-          background: '#0f172a',
+          padding: '0.75rem 1rem',
+          background: '#1e293b',
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem',
+          flexShrink: 0,
+          width: '100%',
+          boxSizing: 'border-box',
         }}
       >
-        <span style={{ color: '#10b981' }}>$</span>
+        <span style={{ color: '#10b981', fontWeight: 'bold', flexShrink: 0 }}>$</span>
         <input
           ref={inputRef}
           type="text"
@@ -228,18 +238,23 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isRunning}
-          placeholder="Enter command (e.g., npm run compile, npm run test)"
+          placeholder="npm run test  |  npm run compile  |  npm run lint"
+          autoFocus
           style={{
             flex: 1,
-            background: '#1e293b',
+            background: '#0f172a',
             color: '#10b981',
-            border: 'none',
-            padding: '0.5rem',
+            border: '1px solid #475569',
+            padding: '0.5rem 0.75rem',
             fontFamily: 'Courier New, monospace',
             fontSize: '0.875rem',
             outline: 'none',
             opacity: isRunning ? 0.5 : 1,
+            cursor: isRunning ? 'not-allowed' : 'text',
+            width: '100%',
           }}
+          onFocus={(e) => e.target.style.borderColor = '#059669'}
+          onBlur={(e) => e.target.style.borderColor = '#475569'}
         />
       </div>
     </div>
