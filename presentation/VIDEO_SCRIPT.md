@@ -136,109 +136,144 @@ Confidence Scoring:
 
 ---
 
-## SLIDE 6: Live Demo (2:50-3:40)
+## SLIDE 6: Live Demo (2:50-4:00)
 
-**Visual:** Screen recording of actual testnet interaction with console logs
+**Visual:** Screen recording of the live dashboard at moc-xchain.replit.app
 
 **Voiceover:**
-> "Let's see it in action. Here's our deployed system on Sepolia and Base Sepolia testnets. We call relayLatestPrice on the origin chain. The contract reads Chainlink's ETH/USD feed, currently $2,001.32. It calculates a confidence score of 95% and emits the update event. Within 3 seconds, our Reactive Contract **actively detects** the event - this is the key moment where Reactive Contracts matter. The RC receives the event, validates the confidence threshold, checks replay protection, updates temporal state, and relays to Base Sepolia. We'll show this happening in real-time with RC logs. The destination contract performs security checks - authorized relayer, sequential round ID, positive answer - all pass. The price is now available on Base Sepolia with full Chainlink compatibility. Any DApp can call latestRoundData and receive the mirrored feed. The entire flow took 4.2 seconds with zero manual intervention."
-
-**Demo Sequence to Show:**
-
-1. **Origin Feed Trigger:**
-   ```
-   TX: 0x7f3b4d9c2e8a1f6d5c4b3a2e1d0c9b8a7f6e5d4c3b2a1e0d9c8b7a6f5e4d3c2b
-   Block: 5,432,245
-   Event: PriceUpdateEmitted(roundId=100, price=$2,001.32, confidence=9583)
-   ```
-
-2. **Confidence Score Computation:**
-   ```
-   Fresh: 300s ago = 9167/10000 (91.67%)
-   Consistency: Sequential round = 10000/10000 (100%)
-   Average: (9167 + 10000) / 2 = 9583 ✓ ACCEPT
-   ```
-
-3. **Reactive Contract Reaction (ACTIVE):**
-   ```
-   [RC] Event detected: PriceUpdateEmitted
-   [RC] Confidence check: 9583 >= 5000 ✓
-   [RC] Replay protection: Not processed ✓
-   [RC] Temporal drift: 1s (within tolerance)
-   [RC] Creating relay (attempt 1/3)
-   [RC] Executing cross-chain call...
-   ```
-
-4. **Drift Detection Demo:**
-   ```
-   Expected interval: 60s
-   Actual interval: 65s
-   Drift: 8.33% (< 100 threshold)
-   Status: ACCEPTABLE (no healing needed)
-   
-   Next update scenario:
-   Actual interval: 1200s
-   Drift: 1900% (> 100 threshold)
-   Event: TemporalDriftDetected fired!
-   Action: Self-healing triggered
-   ```
-
-5. **Destination Update:**
-   ```
-   TX: 0xd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5
-   Block: 8,765,432
-   Event: PriceUpdated(roundId=100, price=$2,001.32)
-   Gas: 127,834
-   ```
-
-6. **Consumer Integration:**
-   ```
-   Consumer.getLatestPrice()
-   ↓
-   proxy.latestRoundData()
-   ↓
-   Returns: (roundId=100, price=200132000000, updatedAt=..., decimals=8)
-   ↓
-   Result: $2,001.32 ✓
-   
-   Staleness check: 23s < 3600s ✓ FRESH
-   ```
-
-**On Screen Display:**
-```
-┌─────────────────────────────────────────────────┐
-│  MOC Live Testnet Demo                          │
-├─────────────────────────────────────────────────┤
-│                                                 │
-│  ORIGIN (Sepolia) → REACTIVE → DESTINATION     │
-│                                                 │
-│  1. Origin Event: 0x7f3b4d9c... ✓              │
-│     Price: $2,001.32 | Confidence: 95.83%      │
-│                                                 │
-│  2. RC Detection: 2.1s                          │
-│     Validation: ✓ PASS                          │
-│     Confidence: ✓ 9583 >= 5000                  │
-│     Replay: ✓ Not processed                     │
-│                                                 │
-│  3. RC Relay: 0xc2d3e4f5... (127k gas)         │
-│     Attempt: 1/3 | Status: SUCCESS              │
-│                                                 │
-│  4. Destination Update: 0xd4e5f6a7...          │
-│     Stored: ETH/USD = $2,001.32                 │
-│     Staleness: 23s (FRESH) ✓                    │
-│                                                 │
-│  End-to-End Latency: 4.2 seconds                │
-│  Success Rate: 100% (attempt 1)                 │
-│                                                 │
-└─────────────────────────────────────────────────┘
-```
-
-**Key Point Emphasized:** 
-"Notice the Reactive Contract actively responding to the event - not waiting for polling, not needing an oracle operator, just pure reactive automation. This is what Reactive Contracts enable."
+> "Let's see it in action. Here's our live dashboard deployed on Replit. I'm connected with MetaMask to Sepolia testnet. Let me walk you through the complete cross-chain relay flow."
 
 ---
 
-## SLIDE 7: Architecture Deep Dive (3:40-4:10)
+### DEMO STEP 1: Read Current Origin Price (0:10)
+
+**Action:** Click "Read Latest Price" button
+
+**Voiceover:**
+> "First, let's check the current price on the origin chain. We're reading from our MockPriceFeed contract on Sepolia..."
+
+**Show on screen:**
+```
+✓ Read Latest Price
+  roundId: 8
+  price: $1500.0
+  network: Sepolia
+```
+
+---
+
+### DEMO STEP 2: Update the Price (0:25)
+
+**Action:** Click "Update Price to $2500" button, confirm MetaMask transaction
+
+**Voiceover:**
+> "Now I'll update the price to $2500. This creates a new round on the origin chain. The MetaMask popup confirms the transaction on Sepolia..."
+
+**Show on screen:**
+```
+✓ Update Price
+  Transaction confirmed!
+  New price: $2500
+  New roundId: 9
+```
+
+---
+
+### DEMO STEP 3: Relay Price Cross-Chain (0:45)
+
+**Action:** Click "Relay Price" button, confirm MetaMask transaction
+
+**Voiceover:**
+> "Here's where Reactive Contracts come in. I click 'Relay Price' which emits a structured event containing all price data - round ID, answer, timestamps, decimals, and description. The Reactive Network is now listening for this event and will automatically forward it to the Lasna destination chain. This typically takes about one minute for the cross-chain relay to complete."
+
+**Show on screen:**
+```
+✓ Relay Price
+  Event emitted on Sepolia!
+  PriceUpdateEmitted(roundId=9, answer=2500, ...)
+  
+  The Reactive Network will now forward this
+  to the destination chain (~1 minute)
+```
+
+---
+
+### DEMO STEP 4: Show Security Features (1:15)
+
+**Action:** Click "Test Edge Cases" to show replay protection
+
+**Voiceover:**
+> "While we wait, let me show a key security feature - replay protection. If I try to relay the same round ID again..."
+
+**Show on screen:**
+```
+✗ Relay Price (same round)
+  Error: This price round was already sent.
+  Replay protection working correctly!
+```
+
+---
+
+### DEMO STEP 5: Confirm Destination Update (1:45)
+
+**Action:** Click "Read Destination Price" button
+
+**Voiceover:**
+> "Now let's check if the price has arrived on the destination chain. I click 'Read Destination Price' which reads from Lasna, the Reactive Network..."
+
+**Show on screen:**
+```
+✓ Read Destination Price
+  roundId: 9
+  price: $2500.0
+  updatedAt: 2025-11-28T11:42:00Z
+  network: Lasna (Reactive Network)
+  
+  Cross-chain relay CONFIRMED!
+```
+
+**Voiceover:**
+> "And there it is! The price has been successfully mirrored from Sepolia to Lasna. The round ID matches, the price matches - our cross-chain oracle relay is working perfectly. Zero manual intervention after the initial trigger - pure reactive automation."
+
+---
+
+**Key Points to Emphasize:**
+- "Notice the Reactive Contract actively responding to the event"
+- "Not waiting for polling, not needing an oracle operator"
+- "About one minute for cross-chain confirmation"
+- "Full Chainlink AggregatorV3Interface compatibility on destination"
+
+**On Screen Summary:**
+```
+┌─────────────────────────────────────────────────┐
+│  MOC Live Demo - Complete Flow                  │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  SEPOLIA (Origin)                               │
+│    └─ Price updated: $1500 → $2500              │
+│    └─ Relay event emitted                       │
+│                                                 │
+│         ↓ (~1 minute)                           │
+│                                                 │
+│  REACTIVE NETWORK                               │
+│    └─ Event detected                            │
+│    └─ Validation passed                         │
+│    └─ Forwarded to destination                  │
+│                                                 │
+│         ↓                                       │
+│                                                 │
+│  LASNA (Destination)                            │
+│    └─ Price received: $2500 ✓                   │
+│    └─ roundId: 9 ✓                              │
+│    └─ Chainlink-compatible interface            │
+│                                                 │
+│  Cross-Chain Relay: SUCCESS                     │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## SLIDE 7: Architecture Deep Dive (4:00-4:20)
 
 **Visual:** Multi-layer architecture diagram with data flow
 
@@ -262,7 +297,7 @@ Consumer DApp ✓
 
 ---
 
-## SLIDE 8: Security & Reliability (4:10-4:40)
+## SLIDE 8: Security & Reliability (4:20-4:40)
 
 **Visual:** Security checklist with checkmarks
 
@@ -291,7 +326,7 @@ Reliability Metrics:
 
 ---
 
-## SLIDE 9: Competitive Differentiation (4:40-5:00)
+## SLIDE 9: Competitive Differentiation (4:40-4:55)
 
 **Visual:** Comparison matrix against competitors
 
@@ -380,10 +415,17 @@ Each section must hit its mark:
 - Solution: 40s
 - Why RC: 40s
 - Innovation: 40s
-- Demo: 50s
-- Architecture: 30s
-- Security: 30s
-- Differentiation: 20s
-- Closing: Flash
+- Demo: 70s (includes ~1 min wait for cross-chain confirmation)
+- Architecture: 20s
+- Security: 20s
+- Differentiation: 15s
+- Closing: 5s
 
-**Total: Exactly 5 minutes**
+**Total: ~5 minutes**
+
+**Demo Timing Breakdown:**
+- Step 1 (Read Origin): 10s
+- Step 2 (Update Price): 15s
+- Step 3 (Relay + explain wait): 30s
+- Step 4 (Security demo while waiting): 30s
+- Step 5 (Confirm Destination): 15s
