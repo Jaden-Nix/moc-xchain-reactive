@@ -84,22 +84,21 @@
 ## [1:50-2:50] RUN ATTACK SIMULATION (THE KEY MOMENT)
 
 **DO:**
-- Scroll to the bottom
-- Click "Open Terminal" button (bottom right)
-- In the terminal, type: `npx hardhat run scripts/test/simulate_attack.js --network hardhat`
-- Press Enter
-- Wait for the FULL output to complete (it takes ~10-15 seconds)
+- Scroll down to the Security Event Log section
+- Click the red **"🦹 Run Attack Simulation"** button
+- Wait for the attacks to complete (~10-15 seconds)
+- Watch the Security Event Log table populate with real-time events
 
 **SAY (while it runs):**
-> "Now watch what happens when I run our Villain Mode attack simulation. This script tries to inject four different types of malicious data directly into the destination smart contract. This is NOT simulated—it's real contract behavior. Watch what gets rejected."
+> "Now watch this. I'm clicking Run Attack Simulation. This runs real attacks against the smart contract - zero price, negative price, flash crash, and replay attacks. Watch the Security Event Log update in real-time."
 
-*Let the output run. Read it aloud as it appears:*
+*Wait for the events to appear in the table, then point at them:*
 
-> "Attack 1: Zero price injection - REJECTED with InvalidAnswer(). Attack 2: Negative price - REJECTED with InvalidAnswer(). Attack 3: Flash crash, a 99% price drop - REJECTED with DeviationTooHigh(). Attack 4: Replay attack with old data - REJECTED with InvalidRoundId()."
+> "Look at the table - every attack is marked BLOCKED in red. Zero price injection - BLOCKED with InvalidAnswer. Negative price - BLOCKED. Flash crash, a 99% price drop - BLOCKED with DeviationTooHigh. Replay attack - BLOCKED with InvalidRoundId."
 
-*After it finishes, point at the summary:*
+*Point at the summary stats at the bottom:*
 
-> "Look at this: 4 out of 4 attacks neutralized. The smart contract is catching every attack, returning specific error codes. This isn't logging or filtering—this is the actual contract reverting malicious transactions. That's real security."
+> "4 attacks blocked. 100% threat detection. This isn't simulated - these are real smart contract reverts happening on-chain. The circuit breaker is working."
 
 ---
 
