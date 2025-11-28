@@ -198,23 +198,57 @@ Confidence Scoring:
 
 ---
 
-### DEMO STEP 4: Show Security Features (1:15)
+### DEMO STEP 4: Run Attack Simulation (1:15)
 
-**Action:** Click "Test Edge Cases" to show replay protection
+**Action:** Open Terminal in dashboard, run: `npx hardhat run scripts/test/simulate_attack.js --network hardhat`
 
 **Voiceover:**
-> "While we wait, let me show a key security feature - replay protection. If I try to relay the same round ID again..."
+> "While we wait for the cross-chain relay, let me prove this system is secure. I'll run our 'Villain Mode' attack simulation - a script that tries to inject malicious data into the system. Watch what happens..."
 
-**Show on screen:**
+**Show on screen (Terminal output):**
 ```
-✗ Relay Price (same round)
-  Error: This price round was already sent.
-  Replay protection working correctly!
+╔══════════════════════════════════════════════════════════════╗
+║           🦹 MOC SECURITY STRESS TEST - VILLAIN MODE 🦹       ║
+╚══════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════
+                    COMMENCING ATTACK SEQUENCE                  
+═══════════════════════════════════════════════════════════════
+
+[ATTACK 1] 🕳️  THE BLACK HOLE - Injecting Zero Price ($0)...
+❌ REJECTED by Destination Contract.
+   Reason: InvalidAnswer() - Price must be positive
+🛡️  System Safety: MAINTAINED
+
+[ATTACK 2] ➖  THE NEGATOR - Injecting Negative Price (-$500)...
+❌ REJECTED by Destination Contract.
+   Reason: InvalidAnswer() - Negative prices rejected
+🛡️  System Safety: MAINTAINED
+
+[ATTACK 3] 📉  THE FLASH CRASH - Injecting 99% Price Drop...
+❌ REJECTED by Destination Contract.
+   Reason: DeviationTooHigh() - 99% deviation exceeds 10% threshold
+🛡️  System Safety: MAINTAINED
+
+[ATTACK 4] 🧟  THE ZOMBIE - Replaying Stale Round ID...
+❌ REJECTED by Destination Contract.
+   Reason: InvalidRoundId() - Round 50 < Latest Round 100
+🛡️  System Safety: MAINTAINED
+
+✅ 4/4 ATTACKS NEUTRALIZED
+
+   ╔═══════════════════════════════════════════════════════╗
+   ║  🏆 ALL MALICIOUS INPUTS REJECTED                      ║
+   ║  🛡️  FEED INTEGRITY: 100% MAINTAINED                   ║
+   ╚═══════════════════════════════════════════════════════╝
 ```
+
+**Voiceover:**
+> "Four different attack vectors - zero price injection, negative prices, flash crash manipulation, and replay attacks - ALL rejected. This isn't just claiming security, this is proving it works under fire."
 
 ---
 
-### DEMO STEP 5: Confirm Destination Update (1:45)
+### DEMO STEP 5: Confirm Destination Update (2:00)
 
 **Action:** Click "Read Destination Price" button
 

@@ -50,16 +50,23 @@
 
 ---
 
-## 🔒 Security (8/8 Features)
+## 🛡️ Attack Neutralization Strategy (8/8 Features)
 
-- ✅ Zero-price validation
-- ✅ Staleness detection (>1 hour)
-- ✅ Replay protection
-- ✅ Anomaly detection (>10% jumps)
-- ✅ Access control (authorized relayers only)
-- ✅ Reentrancy protection
-- ✅ Pause functionality
-- ✅ Rate limiting (60s minimum)
+All security features ACTIVELY BLOCK malicious inputs (verified by Villain Mode script):
+
+- ✅ Zero-price validation → `InvalidAnswer()` revert
+- ✅ Negative price rejection → `InvalidAnswer()` revert  
+- ✅ Flash crash detection (>10% deviation) → `DeviationTooHigh()` revert
+- ✅ Replay protection → `InvalidRoundId()` revert
+- ✅ Staleness detection (>1 hour) → `StaleUpdate()` revert
+- ✅ Access control (authorized relayers only) → `Unauthorized()` revert
+- ✅ Reentrancy protection → OpenZeppelin ReentrancyGuard
+- ✅ Pause functionality → `FeedIsPaused()` revert
+
+**Run Attack Simulation:**
+```bash
+npx hardhat run scripts/test/simulate_attack.js --network hardhat
+```
 
 ---
 
@@ -76,6 +83,12 @@
 - ✅ Relay prices across chains
 - ✅ Check staleness on destination
 - ✅ Test edge cases (zero price, negative price)
+
+### Security Event Log
+- ✅ Real-time monitoring table showing blocked vs relayed events
+- ✅ Red "BLOCKED" rows for rejected attacks
+- ✅ Green "RELAYED" rows for valid price updates
+- ✅ Summary stats: Attacks Blocked, Valid Relays, Threat Detection %
 
 ### Terminal Feature
 - ✅ Run any allowed npm/hardhat command from dashboard

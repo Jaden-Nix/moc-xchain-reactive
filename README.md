@@ -124,7 +124,7 @@ Unlike standard bridges that blindly forward data, MOC actively defends against 
 |---------------|-------------------|--------|
 | Zero-price injection | `InvalidAnswer()` - Rejects `answer <= 0` | 🛡️ BLOCKED |
 | Negative prices | Solidity type validation | 🛡️ BLOCKED |
-| Flash crash (>10% deviation) | `AnomalyDetected()` threshold guard | 🛡️ BLOCKED |
+| Flash crash (>10% deviation) | `DeviationTooHigh()` revert | 🛡️ BLOCKED |
 | Stale/replay data | `InvalidRoundId()` monotonic sequence | 🛡️ BLOCKED |
 | Unauthorized relayers | `Unauthorized()` access control | 🛡️ BLOCKED |
 | Reentrancy attacks | OpenZeppelin ReentrancyGuard | 🛡️ BLOCKED |
@@ -347,7 +347,7 @@ npx hardhat run scripts/test/simulate_attack.js --network hardhat
 |-------------|------------------|--------|
 | 🕳️ Zero Price ($0) | `InvalidAnswer()` check | ❌ BLOCKED |
 | ➖ Negative Price (-$500) | Solidity type safety | ❌ BLOCKED |
-| 📉 Flash Crash (99% drop) | `AnomalyDetected()` guard | ❌ BLOCKED |
+| 📉 Flash Crash (99% drop) | `DeviationTooHigh()` revert | ❌ BLOCKED |
 | 🧟 Stale/Replay Data | `InvalidRoundId()` monotonic check | ❌ BLOCKED |
 
 > *"Unlike standard bridges that blindly forward data, MOC was subjected to a barrage of simulated edge cases. The Reactive layer successfully filtered 100% of anomalies."*
