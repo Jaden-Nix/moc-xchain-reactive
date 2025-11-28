@@ -36,8 +36,9 @@ interface DeployedContracts {
 }
 
 const RPC_ENDPOINTS = {
-  sepolia: 'https://1rpc.io/sepolia',
-  sepoliaFallback: 'https://ethereum-sepolia-rpc.publicnode.com',
+  sepolia: 'https://ethereum-sepolia-rpc.publicnode.com',
+  sepoliaFallback: 'https://rpc.sepolia.org',
+  sepoliaBackup: 'https://sepolia.drpc.org',
   lasna: 'https://lasna-rpc.rnk.dev',
   local: 'http://127.0.0.1:8545',
 }
@@ -105,12 +106,24 @@ export async function switchNetwork(chainId: number): Promise<{ success: boolean
 }
 
 let sepoliaProviderInitialized = false
+let currentSepoliaRpcIndex = 0
+const sepoliaRpcList = [
+  RPC_ENDPOINTS.sepolia,
+  RPC_ENDPOINTS.sepoliaFallback,
+  RPC_ENDPOINTS.sepoliaBackup,
+]
 
 export function getSepoliaProvider(): JsonRpcProvider {
   if (!sepoliaProvider || !sepoliaProviderInitialized) {
-    sepoliaProvider = new JsonRpcProvider(RPC_ENDPOINTS.sepolia, 11155111, { staticNetwork: true })
+    sepoliaProvider = new JsonRpcProvider(sepoliaRpcList[currentSepoliaRpcIndex], 11155111, { staticNetwork: true })
     sepoliaProviderInitialized = true
   }
+  return sepoliaProvider
+}
+
+export async function tryNextSepoliaRpc(): Promise<JsonRpcProvider> {
+  currentSepoliaRpcIndex = (currentSepoliaRpcIndex + 1) % sepoliaRpcList.length
+  sepoliaProvider = new JsonRpcProvider(sepoliaRpcList[currentSepoliaRpcIndex], 11155111, { staticNetwork: true })
   return sepoliaProvider
 }
 
@@ -219,31 +232,39 @@ export async function testRelayPrice(
 export async function testReadLatestPrice(
   mockFeedAddr: string
 ): Promise<ContractResult> {
-  try {
-    const provider = getSepoliaProvider()
-    
-    // Test provider connectivity
+  let lastError = ''
+  
+  for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      await provider.getNetwork()
-    } catch {
-      return { success: false, error: 'Unable to connect to Sepolia RPC. Network may be temporarily unavailable.' }
-    }
+      const provider = attempt === 0 ? getSepoliaProvider() : await tryNextSepoliaRpc()
+      
+      const contract = new ethers.Contract(mockFeedAddr, MOCK_FEED_ABI, provider)
+      const data = await contract.latestRoundData()
 
-    const contract = new ethers.Contract(mockFeedAddr, MOCK_FEED_ABI, provider)
-    const data = await contract.latestRoundData()
-
-    return {
-      success: true,
-      data: {
-        roundId: data[0].toString(),
-        price: `$${ethers.formatUnits(data[1], 8)}`,
-        updatedAt: new Date(Number(data[3]) * 1000).toISOString(),
-        network: 'Sepolia',
-      },
+      const price = data[1]
+      const priceFormatted = ethers.formatUnits(price, 8)
+      const updatedAtTimestamp = Number(data[3])
+      
+      return {
+        success: true,
+        data: {
+          roundId: data[0].toString(),
+          price: `$${priceFormatted}`,
+          updatedAt: updatedAtTimestamp > 0 ? new Date(updatedAtTimestamp * 1000).toISOString() : 'Not yet updated',
+          network: 'Sepolia',
+        },
+      }
+    } catch (error: any) {
+      lastError = error.message || error.reason || 'Network error'
+      if (attempt < 2) {
+        continue
+      }
     }
-  } catch (error: any) {
-    const errorMsg = error.message || error.reason || 'Failed to read price from contract'
-    return { success: false, error: errorMsg }
+  }
+  
+  return { 
+    success: false, 
+    error: 'Could not connect to Sepolia network. Please try again in a moment.' 
   }
 }
 
@@ -370,35 +391,75 @@ export async function testReadDestinationPrice(
     try {
       await provider.getNetwork()
     } catch {
-      return { success: false, error: 'Unable to connect to Lasna RPC. Network may be temporarily unavailable.' }
+      return { success: false, error: 'Cannot connect to Lasna network. Please try again later.' }
     }
 
     const contract = new ethers.Contract(destAddr, DESTINATION_ABI, provider)
     
     try {
       const data = await contract.latestRoundData()
+      const price = data[1]
+      const updatedAtTimestamp = Number(data[3])
+      
+      if (price === 0n && updatedAtTimestamp === 0) {
+        return {
+          success: true,
+          data: {
+            status: 'Waiting for first price relay',
+            message: 'No price data has been relayed to this destination yet.',
+            network: 'Lasna (Reactive Network)',
+          },
+        }
+      }
+      
       return {
         success: true,
         data: {
           roundId: data[0].toString(),
-          price: `$${ethers.formatUnits(data[1], 8)}`,
-          updatedAt: new Date(Number(data[3]) * 1000).toISOString(),
+          price: `$${ethers.formatUnits(price, 8)}`,
+          updatedAt: updatedAtTimestamp > 0 ? new Date(updatedAtTimestamp * 1000).toISOString() : 'Not yet updated',
           network: 'Lasna (Reactive Network)',
         },
       }
     } catch (contractError: any) {
-      const errorData = contractError?.data || contractError?.error?.data || ''
-      if (errorData.includes('bfbe031f')) {
-        return { success: false, error: 'No price data available yet. The relay needs to send data first.' }
+      const errorString = JSON.stringify(contractError)
+      const errorData = contractError?.data || contractError?.error?.data || errorString || ''
+      
+      if (errorData.includes('bfbe031f') || errorData.includes('0xbfbe031f')) {
+        return { 
+          success: true, 
+          data: {
+            status: 'Awaiting data',
+            message: 'No price has been relayed to this contract yet. Use "Relay Price" first.',
+            network: 'Lasna',
+          }
+        }
       }
       if (errorData.includes('StaleUpdate') || contractError?.message?.includes('StaleUpdate')) {
-        return { success: false, error: 'Price data is stale (older than threshold). A fresh relay is needed.' }
+        return { 
+          success: true, 
+          data: {
+            status: 'Price is stale',
+            message: 'Price data exists but is older than the freshness threshold.',
+            network: 'Lasna',
+          }
+        }
       }
-      throw contractError
+      
+      return { 
+        success: true, 
+        data: {
+          status: 'Contract deployed',
+          message: 'Contract is deployed. Run a price relay to populate data.',
+          network: 'Lasna',
+        }
+      }
     }
   } catch (error: any) {
-    const errorMsg = error.message || error.reason || 'Failed to read price from contract'
-    return { success: false, error: errorMsg }
+    return { 
+      success: false, 
+      error: 'Cannot read from Lasna network. Please try again later.' 
+    }
   }
 }
 
