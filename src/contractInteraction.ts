@@ -404,7 +404,7 @@ export async function testDestinationUpdate(
   mockFeedAddr: string
 ): Promise<ContractResult> {
   try {
-    const signer = await getSigner()
+    let signer = await getSigner()
     if (!signer) {
       return { success: false, error: 'Please connect your wallet first' }
     }
@@ -424,6 +424,12 @@ export async function testDestinationUpdate(
     const switchResult = await switchNetwork(CHAIN_IDS.lasna)
     if (!switchResult.success) {
       return { success: false, error: `Failed to switch to Lasna: ${switchResult.error}` }
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    signer = await getSigner()
+    if (!signer) {
+      return { success: false, error: 'Wallet disconnected after network switch. Please try again.' }
     }
 
     const destContract = new ethers.Contract(destAddr, DESTINATION_ABI, signer)
@@ -471,6 +477,9 @@ export async function testDestinationUpdate(
     }
     if (msg.includes('InvalidAnswer') || errorData.includes('InvalidAnswer')) {
       return { success: false, error: 'Price data is invalid or too old. Update the MockPriceFeed with a fresh price.' }
+    }
+    if (msg.includes('network changed') || msg.includes('underlying network changed')) {
+      return { success: false, error: 'Network changed during transaction. Please make sure you are on Lasna network and try again.' }
     }
     return { success: false, error: `Update failed: ${error.reason || error.message}` }
   }
