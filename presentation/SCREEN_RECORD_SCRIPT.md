@@ -1,199 +1,234 @@
-# 🎬 MOC Hackathon Demo Script - FINAL VERSION
-## 5-Minute Video | Reactive Network Bounty Submission
-
-**Recording date: November 28, 2025**
+# 🎬 MOC Hackathon Demo Script - DETAILED VERSION
+## 5-7 Minute Video | Solving Real Oracle Problems
 
 ---
 
-## SETUP BEFORE YOU HIT RECORD
+## [0:00-0:15] INTRO: THE PROBLEM
 
-✅ Connect MetaMask to **Sepolia testnet**  
-✅ Have **0.5+ Sepolia ETH** in wallet  
-✅ Have **0.5+ REACT** in wallet for Lasna  
-✅ Refresh the dashboard page  
-✅ Test one "Send to Destination" click before recording to confirm flow works  
-
----
-
-## [0:00-0:10] INTRO
-
-**SHOW:** Yourself on camera for 5-7 seconds  
+**SHOW:** Yourself on camera  
 **SAY:**
-> "Hi, I'm [YOUR NAME]. This is MOC - Mirror of Chainlink. It's a cross-chain price relay that brings Chainlink feeds from Sepolia to Lasna using Reactive Contracts. I'm going to show you how it works, then I'll prove it's bulletproof by running real attack simulations against it."
+> "Hi, I'm [YOUR NAME]. I want to talk about a real problem in blockchain. Chainlink price feeds are amazing - they're the industry standard for on-chain prices. But here's the issue: Chainlink is only deployed on certain networks. If you're building on a smaller testnet or a newer L2, you don't have access to those feeds. Your smart contracts are blind. No price data, no DeFi, no derivatives, no trading."
 
 ---
 
-## [0:10-0:30] SHOW DEPLOYMENT INFO
-
-**DO:**
-- Scroll down slightly to see both Sepolia and Lasna contracts
-- Point at contract addresses and TX hashes
+## [0:15-0:45] THE CURRENT PROBLEM
 
 **SAY:**
-> "This is production. Every contract is deployed and verified on live testnets. MockPriceFeed on Sepolia, OriginFeedRelay, and the destination contracts on Lasna. All auditable on-chain."
+> "The old solution? Trust a centralized relayer. Some backend service reads Chainlink on Ethereum, then manually sends the price to your chain. But that's a single point of failure. What if the relayer goes down? What if it's compromised? What if it sends you fake prices to manipulate your protocol?"
+
+> "The nightmare scenario: An attacker controls the relayer and sends a fake price of $0 into your lending protocol. It liquidates everyone. Or they send a price of $1 million instead of $1 - suddenly your collateral is worthless. These attacks are real. They happen."
+
+> "You need trustless cross-chain message passing. You need validation on the destination. You need a firewall."
 
 ---
 
-## [0:30-0:50] GO TO INTERACTIVE TESTS TAB
+## [0:45-1:15] INTRODUCING MOC
+
+**SHOW:** Dashboard title  
+**SAY:**
+> "This is MOC - Mirror of Chainlink. It solves this problem using Reactive Contracts. Here's how it works:"
+
+> "First, on the origin chain - that's Sepolia - we read the canonical Chainlink price feed using AggregatorV3Interface. We capture all the data: the round ID, the price, the timestamp, everything. We cryptographically sign it."
+
+> "Then, we send that signed message to the Reactive Network. The Reactive Network is the middleware - it listens to events on Sepolia and automatically relays them to Lasna."
+
+> "Finally, on Lasna, we have a smart contract that validates the price before storing it. It checks for attacks. Zero prices? Rejected. Negative prices? Rejected. Flash crashes - price drops 99%? Rejected. Replay attacks with old data? Rejected. Only valid prices make it through."
+
+---
+
+## [1:15-1:45] SHOW THE CONTRACTS
+
+**DO:** Scroll down on Deployment Info tab to show both chains  
+**POINT AT:** Contract addresses and TX hashes  
+**SAY:**
+> "This is production code. Every contract is deployed and verified on live testnets. You can check the addresses on Etherscan and the Reactive Network explorer. The OriginFeedRelay on Sepolia, the reactor in the middle, and the destination FeedProxy on Lasna. This isn't a simulation - it's real cross-chain infrastructure."
+
+---
+
+## [1:45-2:05] GO TO INTERACTIVE TESTS
 
 **DO:** Click "Interactive Tests" tab
 
 **SAY:**
-> "Now let's test the full cross-chain flow."
+> "Let me show you the full end-to-end flow. First, I'm going to read the current price on Sepolia."
 
 ---
 
-## [0:50-1:10] READ STARTING PRICE
+## [2:05-2:25] READ STARTING PRICE
 
 **DO:**
 - Click **"Read Latest Price"** button
-- Wait for result, point at price on screen
+- Point at the result
 
 **SAY:**
-> "First, I read the current price on Sepolia. It's $1500 in round 8. Now I'll update it."
+> "Current price on Sepolia: $1500. Round ID 8. This is coming directly from the MockPriceFeed that simulates Chainlink. Now I'm going to update it to simulate a price change."
 
 ---
 
-## [1:10-1:30] UPDATE PRICE
+## [2:25-2:50] UPDATE PRICE
 
 **DO:**
-- Scroll to **"Update Price → $1500"** button
+- Scroll to find **"Update Price"** button
 - Click it
 - Confirm in MetaMask
-- Wait for TX to confirm
+- Wait for TX
 
 **SAY:**
-> "Updating the price to a new value. Confirming in MetaMask... Done. New round created with a fresh price."
+> "I'm updating the price. Confirming in MetaMask. This creates a new round on the origin chain. Round 9 with a fresh price. The OriginFeedRelay contract just emitted an event saying 'Hey, new price available.'"
 
 ---
 
-## [1:30-2:00] SEND TO DESTINATION (THE SYNC)
+## [2:50-3:15] EXPLAIN THE RELAY DECISION
+
+**SAY:**
+> "Now here's where it gets interesting. The Reactive Network is listening. It picked up that event. But it's not just blindly relaying the price. It's queuing it up for validation on the destination."
+
+> "I'm going to manually trigger the relay by clicking 'Send to Destination.' In production, this happens automatically, but I'm showing you the step for transparency."
+
+---
+
+## [3:15-3:50] SEND TO DESTINATION (MANUAL CLICK)
 
 **DO:**
-- Scroll down to **"Send to Destination"** button
-- Click it
-- Confirm in MetaMask for Sepolia
-- Confirm in MetaMask for Lasna (wallet will switch chains)
-- Wait ~5 seconds for both TXs to complete
+- Click **"Send to Destination"** button
+- Confirm MetaMask tx 1 (Sepolia read)
+- Wait for chain switch
+- Confirm MetaMask tx 2 (Lasna write)
+- Wait for both to confirm
+- Point at success message
 
 **SAY:**
-> "Now I'm sending this price across chains. First transaction on Sepolia to read the data, then it automatically switches to Lasna and confirms the second transaction. This is the cross-chain relay happening right now."
+> "First transaction: reading the data from Sepolia. Second transaction: writing it to Lasna. Two transactions, two confirmations. The price is now on Lasna, but here's what happened behind the scenes:"
 
-*Point at the green success message:*
-
-> "Both confirmed. The price is now on Lasna."
+> "The DestinationFeedProxy checked the decimals - they match. Checked the timestamp - it's fresh, not stale. Checked for anomalies - the price didn't crash or spike. Checked if this round was already processed - it wasn't, so no replay attack. Only then did it store the price."
 
 ---
 
-## [2:00-2:30] VERIFY ON DESTINATION
+## [3:50-4:15] VERIFY ON DESTINATION
 
 **DO:**
-- Scroll to **"Read Destination Price"** button
-- Click it
-- Wait for result
+- Click **"Read Destination Price"** button
+- Point at the result
 
 **SAY:**
-> "Let me verify the destination received it. Same price, same round ID. The relay worked perfectly."
+> "Same price. Same round ID. The mirror is complete. Lasna now has the Sepolia price. Applications on Lasna can read it using the standard AggregatorV3Interface. They don't even know it came from Sepolia - to them, it looks like a native price feed."
 
 ---
 
-## [2:30-4:00] 🦹 RUN ATTACK SIMULATION - THE MONEY SHOT
+## [4:15-5:30] 🦹 RUN ATTACK SIMULATION - THE DEFENSE PROOF
+
+**SAY:**
+> "Now let me prove this system is actually secure. I'm going to run attack simulations. Four different attacks that real attackers would try. These aren't hypothetical - they're based on actual oracle exploits that have happened."
 
 **DO:**
-- Scroll down to **Security Event Log** section
-- Click the red **"🦹 Run Attack Simulation"** button
-- Watch the table populate over the next 20-30 seconds
+- Scroll to **Security Event Log** section
+- Click red **"🦹 Run Attack Simulation"** button
+- Watch table populate for 20-30 seconds
 
-**SAY (before clicking):**
-> "Now the critical part - security. I'm going to run four different attacks against this contract. Four malicious actors trying to inject fake data. Let's see if it holds."
+**AS ATTACKS APPEAR, NARRATE EACH ONE:**
 
-*Click button. Watch attacks appear.*
+> "Attack 1: Zero-Price Injection. An attacker tries to send a price of $0 to crash the collateral value. The contract sees this before storing it and reverts with InvalidAnswer(). Attack blocked."
 
-**AS EVENTS APPEAR, NARRATE:**
-> "Attack 1: Zero-price injection - BLOCKED with InvalidAnswer(). Attack 2: Negative price manipulation - BLOCKED. Attack 3: Flash crash scenario, 99% price drop - BLOCKED with DeviationTooHigh(). Attack 4: Replay attack using old data - BLOCKED with InvalidRoundId()."
+> "Attack 2: Negative Price Attack. Someone tries to send a negative number to confuse the system. Again, InvalidAnswer(). Rejected before it ever reaches storage."
 
-*Point at summary stats:*
+> "Attack 3: Flash Crash Scenario. The attacker sends a price of $15 when the actual price is $1500 - a 99% drop. The contract has deviation detection. This is 100x different from the last price. DeviationTooHigh(). Blocked."
 
-> "Four attacks launched. Four rejections. 100% Threat Detection. The firewall did exactly what it should do. No bad data made it through."
+> "Attack 4: Replay Attack. An attacker takes old price data from 10 minutes ago and tries to re-submit it. The round ID doesn't match. InvalidRoundId(). Rejected."
+
+**POINT AT SUMMARY STATS:**
+
+> "Four attacks. Four rejections. 100% Threat Detection. Zero successful attacks. This is what production-grade oracle infrastructure looks like."
 
 ---
 
-## [4:00-4:30] EXPLAIN THE ARCHITECTURE
-
-**DO:** 
-- Scroll back to Deployment Info tab
-- Show the three pieces: Origin (Sepolia) → Reactive Network → Destination (Lasna)
+## [5:30-6:15] WHY THIS MATTERS
 
 **SAY:**
-> "Here's what makes this different: Traditional oracle bridges just relay data. MOC validates, filters, and defends. The Reactive Network is the middleware that makes this possible. It's the only platform that lets you build stateful, event-driven contracts like this. The origin chain reads the Chainlink feed. The reactor validates. The destination stores a complete mirror with full AggregatorV3Interface compatibility."
+> "Here's why this matters: Chainlink is great, but it's not everywhere. With MOC, you can take a Sepolia price feed and mirror it to ANY destination chain. Lasna, another testnet, a private L2 - anywhere. You get full Chainlink compatibility with AggregatorV3Interface, so existing applications work without changes."
+
+> "The security model is rock solid. Every price is validated before it's stored. Flash loans can't exploit it. Malicious relayers can't exploit it. Even if the Reactive Network goes down, the last valid price stays on-chain - your system doesn't crash."
+
+> "This is what decentralized oracle infrastructure should look like: Trustless, validated, and auditable on-chain."
 
 ---
 
-## [4:30-5:00] CLOSING
+## [6:15-6:45] CLOSING
 
-**DO:** Look at camera, speak clearly
-
+**SHOW:** Yourself on camera  
 **SAY:**
-> "MOC is built on Reactive Contracts, tested with real attack simulations, and deployed on Sepolia and Lasna testnets. Everything is verifiable on-chain. This is production-grade oracle infrastructure ready for mainnet. That's my submission for the Reactive Network Bounty. Thank you."
+> "MOC is built on Reactive Contracts and deployed on Sepolia and Lasna testnets. Every transaction is verifiable on-chain. The security is proven - 100% attack detection. The interface is compatible with Chainlink. This is production-ready infrastructure for cross-chain price feeds."
+
+> "That's my submission for the Reactive Network Bounty. The problem is real. The solution works. Thank you."
 
 ---
 
-## CRITICAL TIPS FOR RECORDING
+## KEY TALKING POINTS TO EMPHASIZE
 
-1. **Speak slowly** - Let each transaction confirm before talking
-2. **Point at things** - Use cursor to show what you're referencing
-3. **Let transactions breathe** - Don't rush through TX confirmations
-4. **The 100% stat is your proof** - Make sure judges see it clearly
-5. **Edit out MetaMask confirmations if needed** - They're normal but make the video faster
-6. **Pause between sections** - Gives the demo room to breathe
+✅ **The Problem:** Chainlink isn't everywhere. Relayers are centralized and hackable. Flash crash attacks are real.
+
+✅ **The Solution:** MOC mirrors Chainlink trustlessly using Reactive Contracts.
+
+✅ **The Validation:** Every price is checked for attacks before storage.
+
+✅ **The Proof:** 4 real attacks, all blocked, 100% detection rate.
+
+✅ **The Compatibility:** Full AggregatorV3Interface support - existing apps work.
 
 ---
 
 ## TIMING BREAKDOWN
 
-| Timestamp | Action | Duration |
+| Timestamp | Section | Duration |
 |---|---|---|
-| 0:00 | Intro (you on camera) | 10 sec |
-| 0:10 | Scroll Deployment Info | 20 sec |
-| 0:30 | Click Interactive Tests | 20 sec |
-| 0:50 | Read Latest Price | 20 sec |
-| 1:10 | Update Price (+ MetaMask) | 20 sec |
-| 1:30 | Send to Destination (+ 2x MetaMask) | 30 sec |
-| 2:00 | Read Destination Price | 30 sec |
-| 2:30 | **Click Attack Simulation** | 90 sec ⭐ |
-| 4:00 | Explain architecture | 30 sec |
-| 4:30 | Closing statement | 30 sec |
+| 0:00 | Intro: The Problem | 15 sec |
+| 0:15 | Current Problem | 30 sec |
+| 0:45 | Introducing MOC | 30 sec |
+| 1:15 | Show Contracts | 30 sec |
+| 1:45 | Interactive Tests Tab | 20 sec |
+| 2:05 | Read Latest Price | 20 sec |
+| 2:25 | Update Price | 25 sec |
+| 2:50 | Explain Relay | 25 sec |
+| 3:15 | Send to Destination | 35 sec |
+| 3:50 | Verify Destination | 25 sec |
+| 4:15 | **Run Attack Simulation** | 75 sec ⭐ |
+| 5:30 | Why This Matters | 45 sec |
+| 6:15 | Closing | 30 sec |
+
+**Total: ~6:45 (7 minutes with some breathing room)**
 
 ---
 
-## POST-RECORDING CHECKLIST
+## BEFORE YOU HIT RECORD
 
-- [ ] Video is under 5 minutes
-- [ ] All transactions are visible and confirmed
-- [ ] "100% Threat Detection" stat is visible on screen
-- [ ] All 4 attacks show as BLOCKED (red rows)
-- [ ] Audio is clear
-- [ ] No personal info visible in TX hashes (ok to show)
-- [ ] Ready to upload
-
----
-
-## ONE MORE THING
-
-**If the attack simulation doesn't show all 4 attacks:**
-- Scroll down to see if they're below the visible area
-- Re-run it (click the button again)
-- The demo will still show - even 3 blocked attacks proves the defense works
-
-**If a transaction fails:**
-- Close MetaMask, refresh page, try again
-- Make sure you have enough ETH/REACT for gas
-- The workflow is solid - it's likely just a gas or network blip
+- [ ] MetaMask connected to **Sepolia**
+- [ ] 0.5+ Sepolia ETH in wallet
+- [ ] 0.5+ REACT in wallet for Lasna
+- [ ] Page refreshed
+- [ ] Test one "Send to Destination" flow to confirm it works
+- [ ] Quiet background, good lighting
+- [ ] Mic check - audio clear and not too quiet
 
 ---
 
-**You've got this. Go cook. 🚀**
+## IF SOMETHING GOES WRONG
+
+**Attack simulation doesn't show all 4 attacks?**
+- Scroll down, they might be below the fold
+- Re-run it - click the button again
+
+**Transaction fails?**
+- Close MetaMask, refresh page
+- Make sure you have enough gas
+- Try again
+
+**Read price returns no data?**
+- Make sure you clicked "Update Price" first
+- Wait 5 seconds and try reading again
+
+---
+
+**You've got this. This is your story to tell. 🚀**
 
 Deadline: November 30  
-Status: READY FOR SUBMISSION  
+Status: READY FOR RECORDING  
 Last Updated: November 28, 2025
