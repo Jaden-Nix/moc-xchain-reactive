@@ -36,8 +36,8 @@ interface DeployedContracts {
 }
 
 const RPC_ENDPOINTS = {
-  sepolia: 'https://eth-sepolia.public.blastapi.io',
-  sepoliaFallback: 'https://rpc.sepolia.org',
+  sepolia: 'https://1rpc.io/sepolia',
+  sepoliaFallback: 'https://ethereum-sepolia-rpc.publicnode.com',
   lasna: 'https://lasna-rpc.rnk.dev',
   local: 'http://127.0.0.1:8545',
 }
@@ -104,15 +104,19 @@ export async function switchNetwork(chainId: number): Promise<{ success: boolean
   }
 }
 
+let sepoliaProviderInitialized = false
+
 export function getSepoliaProvider(): JsonRpcProvider {
-  if (!sepoliaProvider) {
-    try {
-      sepoliaProvider = new JsonRpcProvider(RPC_ENDPOINTS.sepolia, 11155111, { staticNetwork: true })
-    } catch {
-      sepoliaProvider = new JsonRpcProvider(RPC_ENDPOINTS.sepoliaFallback, 11155111, { staticNetwork: true })
-    }
+  if (!sepoliaProvider || !sepoliaProviderInitialized) {
+    sepoliaProvider = new JsonRpcProvider(RPC_ENDPOINTS.sepolia, 11155111, { staticNetwork: true })
+    sepoliaProviderInitialized = true
   }
   return sepoliaProvider
+}
+
+export async function resetSepoliaProvider(): Promise<void> {
+  sepoliaProvider = new JsonRpcProvider(RPC_ENDPOINTS.sepoliaFallback, 11155111, { staticNetwork: true })
+  sepoliaProviderInitialized = true
 }
 
 export function getLasnaProvider(): JsonRpcProvider {
