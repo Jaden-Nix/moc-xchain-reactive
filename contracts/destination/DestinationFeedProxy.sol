@@ -154,6 +154,7 @@ contract DestinationFeedProxy is AggregatorV3Interface, Ownable, ReentrancyGuard
                     lastRound.answer,
                     deviation
                 );
+                revert DeviationTooHigh();
             }
         }
     }

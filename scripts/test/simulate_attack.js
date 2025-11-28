@@ -28,7 +28,6 @@ async function main() {
   const MockPriceFeed = await ethers.getContractFactory("MockPriceFeed");
   const mockFeed = await MockPriceFeed.deploy("ETH/USD", 8);
   await mockFeed.waitForDeployment();
-  
   await mockFeed.setPrice(200000000000n);
   
   const DestinationFeedProxy = await ethers.getContractFactory("DestinationFeedProxy");
@@ -62,54 +61,41 @@ async function main() {
     await tx.wait();
     log(COLORS.red, "⚠️  VULNERABILITY: Zero price was accepted!");
   } catch (error) {
+    const errorName = error.message.includes("InvalidAnswer") ? "InvalidAnswer()" : "Contract reverted";
     attacksBlocked++;
     log(COLORS.red, "❌ REJECTED by Destination Contract.");
-    log(COLORS.cyan, "   Reason: InvalidAnswer() - Price must be positive");
+    log(COLORS.cyan, `   Reason: ${errorName} - Price must be positive`);
     log(COLORS.green, "🛡️  System Safety: MAINTAINED\n");
   }
 
   log(COLORS.bold + COLORS.yellow, "[ATTACK 2] ➖  THE NEGATOR - Injecting Negative Price (-$500)...");
   try {
     const negativePrice = -50000000000n;
-    await mockFeed.setPrice(negativePrice);
-    const [, answer] = await mockFeed.latestRoundData();
-    if (answer < 0) {
-      log(COLORS.red, "❌ REJECTED by Origin Contract.");
-      log(COLORS.cyan, "   Reason: InvalidAnswer() - Negative prices filtered");
-      log(COLORS.green, "🛡️  System Safety: MAINTAINED\n");
-      attacksBlocked++;
-    }
-  } catch (error) {
-    attacksBlocked++;
-    log(COLORS.red, "❌ REJECTED by Solidity type system.");
-    log(COLORS.cyan, "   Reason: int256 to uint256 conversion fails for negatives");
-    log(COLORS.green, "🛡️  System Safety: MAINTAINED\n");
-  }
-
-  log(COLORS.bold + COLORS.yellow, "[ATTACK 3] 📉  THE FLASH CRASH - Injecting 99% Price Drop...");
-  try {
-    const flashCrashPrice = 2000000000n;
-    const currentPrice = initialPrice;
-    const deviation = Math.abs(Number(flashCrashPrice - currentPrice)) / Number(currentPrice) * 100;
-    
-    if (deviation > 10) {
-      log(COLORS.red, "❌ REJECTED by Anomaly Detection.");
-      log(COLORS.cyan, `   Reason: AnomalyDetected() - ${deviation.toFixed(1)}% deviation exceeds 10% threshold`);
-      log(COLORS.green, "🛡️  System Safety: MAINTAINED\n");
-      attacksBlocked++;
-    } else {
-      const tx = await destination.updatePrice(102n, flashCrashPrice, now, now, 102n, 8, "ETH/USD");
-      await tx.wait();
-      log(COLORS.red, "⚠️  Price update accepted (within tolerance)");
-    }
+    const tx = await destination.updatePrice(102n, negativePrice, now, now, 102n, 8, "ETH/USD");
+    await tx.wait();
+    log(COLORS.red, "⚠️  VULNERABILITY: Negative price was accepted!");
   } catch (error) {
     attacksBlocked++;
     log(COLORS.red, "❌ REJECTED by Destination Contract.");
-    log(COLORS.cyan, "   Reason: AnomalyDetected() - Deviation exceeds safe threshold");
+    log(COLORS.cyan, "   Reason: InvalidAnswer() - Negative prices rejected");
     log(COLORS.green, "🛡️  System Safety: MAINTAINED\n");
   }
 
-  log(COLORS.bold + COLORS.yellow, "[ATTACK 4] 🧟  THE ZOMBIE - Replaying Stale Round ID...");
+  log(COLORS.bold + COLORS.yellow, "[ATTACK 3] 📉  THE FLASH CRASH - Injecting 99% Price Drop ($2000 → $20)...");
+  try {
+    const flashCrashPrice = 2000000000n;
+    const tx = await destination.updatePrice(103n, flashCrashPrice, now, now, 103n, 8, "ETH/USD");
+    await tx.wait();
+    log(COLORS.red, "⚠️  VULNERABILITY: Flash crash price was accepted!");
+  } catch (error) {
+    const errorName = error.message.includes("DeviationTooHigh") ? "DeviationTooHigh()" : "Contract reverted";
+    attacksBlocked++;
+    log(COLORS.red, "❌ REJECTED by Destination Contract.");
+    log(COLORS.cyan, `   Reason: ${errorName} - 99% deviation exceeds 10% threshold`);
+    log(COLORS.green, "🛡️  System Safety: MAINTAINED\n");
+  }
+
+  log(COLORS.bold + COLORS.yellow, "[ATTACK 4] 🧟  THE ZOMBIE - Replaying Stale Round ID (Round 50 < 100)...");
   try {
     const staleRoundId = 50n;
     const stalePrice = 150000000000n;
@@ -119,9 +105,10 @@ async function main() {
     await tx.wait();
     log(COLORS.red, "⚠️  VULNERABILITY: Stale data was accepted!");
   } catch (error) {
+    const errorName = error.message.includes("InvalidRoundId") ? "InvalidRoundId()" : "Contract reverted";
     attacksBlocked++;
-    log(COLORS.red, "❌ REJECTED by Replay Protection.");
-    log(COLORS.cyan, "   Reason: InvalidRoundId() - Round 50 < Latest Round 100");
+    log(COLORS.red, "❌ REJECTED by Destination Contract.");
+    log(COLORS.cyan, `   Reason: ${errorName} - Round 50 < Latest Round 100`);
     log(COLORS.green, "🛡️  System Safety: MAINTAINED\n");
   }
 
@@ -142,8 +129,11 @@ async function main() {
     log(COLORS.green, "   ╚═══════════════════════════════════════════════════════╝");
   } else {
     log(COLORS.bold + COLORS.red, `⚠️  ${attacksBlocked}/${totalAttacks} attacks blocked - REVIEW NEEDED`);
+    log(COLORS.red, `    ${totalAttacks - attacksBlocked} attack(s) succeeded - SECURITY VULNERABILITY DETECTED`);
   }
 
+  log(COLORS.white, "\n");
+  log(COLORS.cyan, "To run this test: npx hardhat run scripts/test/simulate_attack.js --network hardhat");
   log(COLORS.white, "\n");
 }
 
