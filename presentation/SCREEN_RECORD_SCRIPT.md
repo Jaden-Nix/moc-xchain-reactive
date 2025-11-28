@@ -1,9 +1,9 @@
 # Screen Record Script - MOC Hackathon Demo (5 minutes)
+## WITH LIVE ATTACK SIMULATION BUTTON
 
 **What you need:**
 - Dashboard running (it is)
 - MetaMask connected to Sepolia
-- Terminal open (click "Open Terminal" at bottom)
 - This script in front of you
 
 ---
@@ -13,7 +13,7 @@
 **DO:** Show yourself on camera for 10 seconds, then show the dashboard
 
 **SAY:**
-> "Hi, I'm [YOUR NAME]. This is MOC - Mirror of Chainlink, my submission for the Reactive Network Bounty. I'm going to show you how it works, and then I'm going to prove it's secure by running a full attack simulation."
+> "Hi, I'm [YOUR NAME]. This is MOC - Mirror of Chainlink, my submission for the Reactive Network Bounty. I'm going to show you how it works, and then I'm going to prove it's secure by simulating real attacks against the smart contract."
 
 ---
 
@@ -81,42 +81,42 @@
 
 ---
 
-## [1:50-2:50] RUN ATTACK SIMULATION (THE KEY MOMENT)
+## [1:50-3:50] RUN ATTACK SIMULATION (THE KEY MOMENT) ⭐⭐⭐
 
 **DO:**
 - Scroll down to the Security Event Log section
 - Click the red **"🦹 Run Attack Simulation"** button
-- Wait for the attacks to complete (~10-15 seconds)
-- Watch the Security Event Log table populate with real-time events
+- Watch the table populate (takes ~10-15 seconds)
 
-**SAY (while it runs):**
-> "Now watch this. I'm clicking Run Attack Simulation. This runs real attacks against the smart contract - zero price, negative price, flash crash, and replay attacks. Watch the Security Event Log update in real-time."
+**SAY (before clicking):**
+> "Now watch what happens when I run our attack simulation. This button runs 4 different attacks against the destination smart contract. Four attackers are about to try to inject malicious data. Let's see if the contract stops them."
 
-*Wait for the events to appear in the table, then point at them:*
+*Click the button and wait. Narrate as events appear:*
 
-> "Look at the table - every attack is marked BLOCKED in red. Zero price injection - BLOCKED with InvalidAnswer. Negative price - BLOCKED. Flash crash, a 99% price drop - BLOCKED with DeviationTooHigh. Replay attack - BLOCKED with InvalidRoundId."
+> "Attack 1: Zero price injection - BLOCKED with InvalidAnswer(). Attack 2: Negative price - BLOCKED with InvalidAnswer(). Attack 3: Flash crash, a 99% price drop - BLOCKED with DeviationTooHigh(). Attack 4: Replay attack with old data - BLOCKED with InvalidRoundId()."
 
-*Point at the summary stats at the bottom:*
+*Point at the summary stats:*
 
-> "4 attacks blocked. 100% threat detection. This isn't simulated - these are real smart contract reverts happening on-chain. The circuit breaker is working."
+> "Four attacks. Four rejections. All in the Security Event Log. Look at those stats: 4 Attacks Blocked, 100% Threat Detection. This is real contract behavior, not simulated. The firewall worked perfectly."
 
 ---
 
-## [3:10-3:30] READ DESTINATION PRICE (STILL VALID)
+## [3:50-4:10] READ DESTINATION PRICE (STILL VALID)
 
 **DO:**
+- Scroll back to "Interactive Tests" tab
 - Click "Read Destination Price" button
 - Show the result on screen
 
 **SAY:**
-> "And here's the price on the destination chain. It's still $2500. The legitimate price update went through, but all the attacks were stopped. The system did exactly what it should do."
+> "And here's the price on the destination chain. It's still $2500, round ID 9. The legitimate price update went through, but all the attacks were stopped. The system did exactly what it should do."
 
 ---
 
-## [3:30-4:00] EXPLAIN WHY THIS MATTERS
+## [4:10-4:50] EXPLAIN WHY THIS MATTERS
 
 **DO:** 
-- Point back at the Deployment Info tab
+- Scroll back up to Deployment Info tab
 - Show the contract addresses
 
 **SAY:**
@@ -128,7 +128,7 @@
 
 ---
 
-## [4:00-5:00] CLOSING
+## [4:50-5:00] CLOSING
 
 **DO:**
 - Optional: Show GitHub link or any documentation
@@ -149,12 +149,13 @@
 | 0:50 | Click "Read Latest Price" | Show $1500 starting price |
 | 1:10 | Click "Update Price" → MetaMask confirm | Update to $2500 |
 | 1:30 | Click "Relay Price" → MetaMask confirm | Relay to destination chain |
-| 1:50 | Click "Open Terminal" | Prepare for attack demo |
-| 1:50 | Type & run attack script | Run: `npx hardhat run scripts/test/simulate_attack.js --network hardhat` |
-| 2:50 | Terminal output complete | Read aloud: Attack 1 REJECTED, Attack 2 REJECTED, etc. |
-| 3:10 | Click "Read Destination Price" | Verify price is still $2500 |
-| 3:30 | Point at contracts | Explain operational maturity |
-| 4:00 | Close out | Final closing statement |
+| 1:50 | Scroll to Security Event Log | Find the red button |
+| 1:50 | Click **"🦹 Run Attack Simulation"** | Start attack demo |
+| 2:50 | Watch events appear | Narrate: Attack 1 BLOCKED, Attack 2 BLOCKED, etc. |
+| 3:50 | Scroll back to Interactive Tests | Read Destination Price |
+| 4:10 | Click "Read Destination Price" | Verify price is still $2500 |
+| 4:30 | Back to Deployment Info | Explain operational maturity |
+| 4:50 | Close out | Final closing statement |
 
 ---
 
@@ -163,15 +164,22 @@
 1. **Refresh the page** - Make sure you're on latest version
 2. **Connect MetaMask to Sepolia** - Required for Update Price and Relay Price buttons to work
 3. **Have some ETH in your Sepolia wallet** - For the transactions
-4. **Open the terminal once** to test that it works before recording
+4. **Test the button once** - Click "Run Attack Simulation" once before recording to verify it works
 5. **Practice the timing** - Run through once without recording first
 
 ## Pro Tips
 
 - **Speak slowly** - Technical content needs time to sink in
 - **Point at things** - Move your cursor to show what you're talking about
-- **Pause for output** - Give attack simulation time to complete before talking
+- **Pause for output** - Give attack simulation 10-15 seconds to complete
 - **Show the TX hashes** - Zoom in on the addresses so judges can verify
-- **Don't rush the attack demo** - It's the most important part. Let each rejection be clear
+- **Don't rush the attack demo** - It's the most impressive part. Let each rejection be clear
+- **The 100% stat is your proof** - Point at "Threat Detection: 100%" to prove all attacks were caught
 
-That's it. Screen record this and you've got a 5-minute demo ready to go.
+That's it. You now have a 5-minute demo script that shows:
+1. Legitimate price relay working ✓
+2. Attack simulation running ✓
+3. All attacks blocked ✓
+4. Threat detection at 100% ✓
+
+Screen record and you're done! 🎥
