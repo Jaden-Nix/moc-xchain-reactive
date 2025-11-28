@@ -63,6 +63,28 @@
 
 ---
 
+## 📊 Dashboard Features
+
+### Deployment Info Tab
+- View all contract addresses across testnets
+- See transaction hashes for all deployments
+- Requirements verification checklist
+
+### Interactive Tests Tab
+- ✅ Read prices from Sepolia MockPriceFeed
+- ✅ Update prices (requires MetaMask wallet)
+- ✅ Relay prices across chains
+- ✅ Check staleness on destination
+- ✅ Test edge cases (zero price, negative price)
+
+### Terminal Feature
+- ✅ Run any allowed npm/hardhat command from dashboard
+- ✅ View real-time output in terminal window
+- ✅ Command history with arrow key navigation
+- ✅ Works locally and on Vercel deployment
+
+---
+
 ## 🧪 Testing
 
 **Local End-to-End**: ✅ PASSING
@@ -70,29 +92,71 @@
 npx hardhat run scripts/test/fresh-deploy-and-demo.ts --network hardhat
 ```
 
-All tests verify:
-- Contracts deploy
-- Prices update correctly
-- Data flows end-to-end
-- All validations working
+**Terminal Tests** (via dashboard):
+```bash
+npm run test        # Run all tests
+npm run compile     # Compile contracts
+npm run lint        # Lint Solidity
+npm run format      # Format code
+```
 
 ---
 
-## 📁 Contract Files
+## 📁 Project Structure
 
-- `contracts/mocks/MockPriceFeed.sol` - Chainlink-compatible mock
-- `contracts/origin/OriginFeedRelay.sol` - Event emitter for Reactive Contracts
-- `contracts/reactive/PriceFeedReactor.sol` - Reactive Contract listener
-- `contracts/destination/DestinationFeedProxy.sol` - Destination storage proxy
+```
+contracts/
+├── mocks/MockPriceFeed.sol
+├── origin/OriginFeedRelay.sol
+├── reactive/PriceFeedReactor.sol
+└── destination/DestinationFeedProxy.sol
+
+src/
+├── App.tsx                 # Main dashboard
+├── TerminalViewer.tsx      # Interactive terminal
+├── contractInteraction.ts  # Wallet & contract logic
+└── index.css              # Styles
+
+api/
+└── index.js               # Terminal API server
+
+scripts/
+├── deploy/                # Deployment scripts
+└── test/                  # Test scripts
+```
 
 ---
 
-## 🚀 Key Features
+## 🚀 Deployment Options
 
-1. **Event-Driven**: No polling, instant cross-chain updates
-2. **Decentralized**: Validated by Reactive Network infrastructure
-3. **Atomic**: All fields stored together, guaranteed consistency
-4. **Production-Grade**: Full AggregatorV3Interface compatibility
+### Local Testing
+```bash
+npm run dev    # Dashboard + API server
+```
+
+### Vercel Deployment
+```bash
+npm i -g vercel
+vercel login
+vercel
+```
+
+**Environment Variables**: None needed! Uses public RPC endpoints.
+
+**After Deployment**:
+- Dashboard: https://your-project.vercel.app
+- Terminal works on Vercel (runs npm test, etc.)
+- MetaMask wallet connections work from any location
+
+---
+
+## 🔗 Key Technologies
+
+- **Frontend**: React + Vite + TypeScript
+- **Blockchain**: Hardhat + Ethers.js v6
+- **Testnets**: Sepolia (Ethereum) + Lasna (Reactive Network)
+- **Contracts**: Solidity + OpenZeppelin
+- **API**: Node.js Express (terminal commands)
 
 ---
 
@@ -108,6 +172,8 @@ All tests verify:
 - `COMPLETE_DEPLOYMENT_SUMMARY.md` - Detailed architecture and status
 - `REQUIREMENTS_VERIFIED.md` - Line-by-line code verification
 - `SUBMISSION_CHECKLIST.md` - Evidence checklist
+- `VERCEL_DEPLOYMENT.md` - Vercel deployment steps
+- `TERMINAL_GUIDE.md` - Terminal feature guide
 
 ---
 
@@ -115,11 +181,19 @@ All tests verify:
 
 System is READY FOR SUBMISSION. All requirements met and verified on-chain.
 
-Test locally anytime:
+**To Deploy to Vercel**:
+1. Push code to GitHub
+2. Run `vercel` or connect GitHub repo at vercel.com
+3. Share public URL with stakeholders
+
+**To Test Locally**:
 ```bash
-npx hardhat run scripts/test/fresh-deploy-and-demo.ts --network hardhat
+npm run dev          # Start dashboard + API
+npm run test         # Run tests (or use terminal in dashboard)
+npm run compile      # Compile contracts
 ```
 
 ---
 
 **Status: PRODUCTION READY** ✅
+Last Updated: November 28, 2025
