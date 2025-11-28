@@ -35,7 +35,7 @@ async function main() {
   const destination = await DestinationFeedProxy.deploy(8, "ETH/USD");
   await destination.waitForDeployment();
   
-  await destination.authorizeRelayer(deployer.address);
+  await destination.setRelayerAuthorization(deployer.address, true);
   
   const initialPrice = 200000000000n;
   const initialRound = 100n;

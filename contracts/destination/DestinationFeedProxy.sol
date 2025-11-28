@@ -37,7 +37,7 @@ contract DestinationFeedProxy is AggregatorV3Interface, Ownable, ReentrancyGuard
     uint256 public totalUpdates;
     
     uint256 public constant DEFAULT_STALENESS_THRESHOLD = 3600;
-    uint256 public constant MAX_ANSWER_DEVIATION = 5000;
+    uint256 public constant MAX_ANSWER_DEVIATION = 1000; // 10% in basis points
     
     event PriceUpdated(
         uint80 indexed roundId,

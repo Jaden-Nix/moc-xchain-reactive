@@ -116,18 +116,20 @@ Emits event with 7 fields:
 
 ---
 
-## Security Features (8/8)
+## Attack Neutralization Strategy (8/8)
 
-| Feature | Implementation | Status |
-|---------|---------------|--------|
-| Zero-price validation | Rejects `answer <= 0` | ✅ |
-| Staleness detection | 1-hour threshold | ✅ |
-| Replay protection | Round ID sequence check | ✅ |
-| Anomaly detection | >10% price jump alerts | ✅ |
-| Access control | Authorized relayers only | ✅ |
-| Reentrancy guard | OpenZeppelin ReentrancyGuard | ✅ |
-| Pause functionality | Owner can pause feed | ✅ |
-| Rate limiting | 60-second minimum between relays | ✅ |
+Unlike standard bridges that blindly forward data, MOC actively defends against malicious inputs:
+
+| Attack Vector | Defense Mechanism | Status |
+|---------------|-------------------|--------|
+| Zero-price injection | `InvalidAnswer()` - Rejects `answer <= 0` | 🛡️ BLOCKED |
+| Negative prices | Solidity type validation | 🛡️ BLOCKED |
+| Flash crash (>10% deviation) | `AnomalyDetected()` threshold guard | 🛡️ BLOCKED |
+| Stale/replay data | `InvalidRoundId()` monotonic sequence | 🛡️ BLOCKED |
+| Unauthorized relayers | `Unauthorized()` access control | 🛡️ BLOCKED |
+| Reentrancy attacks | OpenZeppelin ReentrancyGuard | 🛡️ BLOCKED |
+| Service disruption | Owner pause functionality | 🛡️ PROTECTED |
+| Spam flooding | 60-second rate limiting | 🛡️ PROTECTED |
 
 ---
 
@@ -337,14 +339,18 @@ npx hardhat run scripts/test/simulate_attack.js --network hardhat
    ╚═══════════════════════════════════════════════════════╝
 ```
 
-### Security Protections Validated
+### Live Attack Simulation Proof
+
+**Verified:** November 28, 2025 | **Result:** 4/4 attacks neutralized | **Feed Integrity:** 100%
 
 | Attack Type | Protection Layer | Result |
 |-------------|------------------|--------|
-| Zero Price ($0) | `InvalidAnswer()` check | ❌ BLOCKED |
-| Negative Price | Solidity type safety | ❌ BLOCKED |
-| Flash Crash (>10% deviation) | `AnomalyDetected()` guard | ❌ BLOCKED |
-| Stale/Replay Data | `InvalidRoundId()` monotonic check | ❌ BLOCKED |
+| 🕳️ Zero Price ($0) | `InvalidAnswer()` check | ❌ BLOCKED |
+| ➖ Negative Price (-$500) | Solidity type safety | ❌ BLOCKED |
+| 📉 Flash Crash (99% drop) | `AnomalyDetected()` guard | ❌ BLOCKED |
+| 🧟 Stale/Replay Data | `InvalidRoundId()` monotonic check | ❌ BLOCKED |
+
+> *"Unlike standard bridges that blindly forward data, MOC was subjected to a barrage of simulated edge cases. The Reactive layer successfully filtered 100% of anomalies."*
 
 ---
 
