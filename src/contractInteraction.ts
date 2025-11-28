@@ -13,11 +13,12 @@ const ORIGIN_RELAY_ABI = [
 ]
 
 const DESTINATION_ABI = [
-  'function updatePrice(uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) external',
+  'function updatePrice(uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound, uint8 decimals, string description) external',
   'function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80)',
-  'function feedConfig() external view returns (tuple(string description, uint8 decimals, uint256 version, bool paused))',
+  'function feedConfig() external view returns (tuple(uint8 decimals, string description, uint256 version, uint256 stalenessThreshold, bool paused))',
   'function isStale() external view returns (bool)',
   'function setRelayerAuthorization(address relayer, bool authorized) external',
+  'function decimals() external view returns (uint8)',
   'event PriceUpdated(uint80 indexed roundId, int256 answer, uint256 updatedAt)',
 ]
 
@@ -389,8 +390,10 @@ export async function testDestinationUpdate(
     const mockContract = new ethers.Contract(mockFeedAddr, MOCK_FEED_ABI, sepoliaProvider)
     
     let latestData
+    let decimals
     try {
       latestData = await mockContract.latestRoundData()
+      decimals = await mockContract.decimals()
     } catch (e) {
       return { success: false, error: 'Could not read price from Sepolia. Try again in a moment.' }
     }
@@ -412,7 +415,9 @@ export async function testDestinationUpdate(
       latestData[1],
       latestData[2],
       latestData[3],
-      latestData[4]
+      latestData[4],
+      decimals,
+      'ETH/USD'
     )
     const receipt = await tx.wait()
 
@@ -427,14 +432,22 @@ export async function testDestinationUpdate(
     }
   } catch (error: any) {
     const msg = error.message || ''
+    const errorData = error.data || error?.error?.data || ''
+    
     if (msg.includes('insufficient funds')) {
       return { success: false, error: 'Insufficient REACT tokens for gas on Lasna network.' }
     }
     if (msg.includes('user rejected') || msg.includes('User denied')) {
       return { success: false, error: 'Transaction was rejected in wallet.' }
     }
-    if (msg.includes('not authorized') || msg.includes('Unauthorized')) {
-      return { success: false, error: 'Your wallet is not authorized as a relayer on the destination contract.' }
+    if (msg.includes('Unauthorized') || errorData.includes('Unauthorized')) {
+      return { success: false, error: 'Your wallet is not authorized as a relayer. Only the contract owner can update prices.' }
+    }
+    if (msg.includes('InvalidRoundId') || errorData.includes('InvalidRoundId')) {
+      return { success: false, error: 'This price round was already sent. Update the MockPriceFeed first to create a new round.' }
+    }
+    if (msg.includes('InvalidAnswer') || errorData.includes('InvalidAnswer')) {
+      return { success: false, error: 'Price data is invalid or too old. Update the MockPriceFeed with a fresh price.' }
     }
     return { success: false, error: `Update failed: ${error.reason || error.message}` }
   }
