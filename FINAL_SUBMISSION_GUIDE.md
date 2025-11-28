@@ -8,7 +8,7 @@
 
 **Dashboard:** [https://moc-xchain.replit.app](https://moc-xchain.replit.app)
 
-Test the complete cross-chain flow directly in your browser!
+Test the complete cross-chain flow directly in your browser
 
 ---
 
