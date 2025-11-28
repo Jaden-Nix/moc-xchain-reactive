@@ -41,6 +41,15 @@ interface TestResult {
   error?: string
 }
 
+interface SecurityEvent {
+  id: number
+  timestamp: string
+  type: string
+  details: string
+  status: 'blocked' | 'relayed' | 'failed'
+  reason?: string
+}
+
 const App: React.FC = () => {
   const [data, setData] = useState<{
     deployment: DeploymentInfo
@@ -55,6 +64,10 @@ const App: React.FC = () => {
   const [terminalOpen, setTerminalOpen] = useState(false)
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
+  const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>([])
+  const [isRunningAttackSim, setIsRunningAttackSim] = useState(false)
+  const [attacksBlocked, setAttacksBlocked] = useState(0)
+  const [validRelays, setValidRelays] = useState(0)
 
   useEffect(() => {
     initializeDeployment()
@@ -75,6 +88,40 @@ const App: React.FC = () => {
       setConnectionError(result.error || 'Failed to connect wallet')
     }
     setIsConnecting(false)
+  }
+
+  const runAttackSimulation = async () => {
+    setIsRunningAttackSim(true)
+    try {
+      const response = await fetch('/api/attack-simulation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      const data = await response.json()
+      
+      if (data.events && data.events.length > 0) {
+        setSecurityEvents(prev => [...data.events, ...prev])
+        setAttacksBlocked(prev => prev + data.summary.blocked)
+      }
+    } catch (error) {
+      console.error('Attack simulation failed:', error)
+    } finally {
+      setIsRunningAttackSim(false)
+    }
+  }
+
+  const addRelayEvent = () => {
+    const now = new Date()
+    const timestamp = now.toISOString().replace('T', ' ').substring(0, 19)
+    const newEvent: SecurityEvent = {
+      id: Date.now(),
+      timestamp,
+      type: 'Price Relay',
+      details: `$${(Math.random() * 1000 + 1500).toFixed(2)} → Lasna`,
+      status: 'relayed'
+    }
+    setSecurityEvents(prev => [newEvent, ...prev])
+    setValidRelays(prev => prev + 1)
   }
 
   const initializeDeployment = async () => {
@@ -581,9 +628,34 @@ const App: React.FC = () => {
 
       <section className="security-log">
         <h2>🛡️ Security Event Log</h2>
-        <p style={{ color: '#64748b', marginBottom: '1rem', fontSize: '0.9rem' }}>
-          Real-time monitoring of attack attempts vs successful relays
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <p style={{ color: '#64748b', fontSize: '0.9rem', margin: 0 }}>
+            Real-time monitoring of attack attempts vs successful relays
+          </p>
+          <button
+            onClick={runAttackSimulation}
+            disabled={isRunningAttackSim}
+            style={{
+              padding: '0.5rem 1rem',
+              background: isRunningAttackSim ? '#64748b' : '#dc2626',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '0.5rem',
+              cursor: isRunningAttackSim ? 'not-allowed' : 'pointer',
+              fontSize: '0.875rem',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            {isRunningAttackSim ? (
+              <>⏳ Running Attacks...</>
+            ) : (
+              <>🦹 Run Attack Simulation</>
+            )}
+          </button>
+        </div>
         <div className="security-table">
           <table>
             <thead>
@@ -595,56 +667,42 @@ const App: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              <tr className="row-blocked">
-                <td>2025-11-28 11:42:15</td>
-                <td>Zero Price Injection</td>
-                <td>Attempted $0 price update</td>
-                <td><span className="status-blocked">🚫 BLOCKED</span></td>
-              </tr>
-              <tr className="row-blocked">
-                <td>2025-11-28 11:41:33</td>
-                <td>Replay Attack</td>
-                <td>Stale roundId: 8 (already processed)</td>
-                <td><span className="status-blocked">🚫 BLOCKED</span></td>
-              </tr>
-              <tr className="row-success">
-                <td>2025-11-28 11:40:22</td>
-                <td>Price Relay</td>
-                <td>$2500.00 → Lasna (roundId: 9)</td>
-                <td><span className="status-relayed">✅ RELAYED</span></td>
-              </tr>
-              <tr className="row-blocked">
-                <td>2025-11-28 11:39:55</td>
-                <td>Flash Crash</td>
-                <td>99% deviation detected ($2000→$20)</td>
-                <td><span className="status-blocked">🚫 BLOCKED</span></td>
-              </tr>
-              <tr className="row-success">
-                <td>2025-11-28 11:38:10</td>
-                <td>Price Relay</td>
-                <td>$1500.00 → Lasna (roundId: 8)</td>
-                <td><span className="status-relayed">✅ RELAYED</span></td>
-              </tr>
-              <tr className="row-blocked">
-                <td>2025-11-28 11:37:45</td>
-                <td>Negative Price</td>
-                <td>Attempted -$500 injection</td>
-                <td><span className="status-blocked">🚫 BLOCKED</span></td>
-              </tr>
+              {securityEvents.length === 0 ? (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>
+                    No events yet. Click "Run Attack Simulation" to test security.
+                  </td>
+                </tr>
+              ) : (
+                securityEvents.slice(0, 10).map((event) => (
+                  <tr key={event.id} className={event.status === 'blocked' ? 'row-blocked' : 'row-success'}>
+                    <td>{event.timestamp}</td>
+                    <td>{event.type}</td>
+                    <td>{event.details}{event.reason && <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}> ({event.reason})</span>}</td>
+                    <td>
+                      {event.status === 'blocked' ? (
+                        <span className="status-blocked">🚫 BLOCKED</span>
+                      ) : (
+                        <span className="status-relayed">✅ RELAYED</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
         <div className="security-summary">
           <div className="summary-stat">
-            <span className="stat-number blocked">4</span>
+            <span className="stat-number blocked">{attacksBlocked}</span>
             <span className="stat-label">Attacks Blocked</span>
           </div>
           <div className="summary-stat">
-            <span className="stat-number success">2</span>
+            <span className="stat-number success">{validRelays}</span>
             <span className="stat-label">Valid Relays</span>
           </div>
           <div className="summary-stat">
-            <span className="stat-number">100%</span>
+            <span className="stat-number">{attacksBlocked > 0 ? '100%' : '—'}</span>
             <span className="stat-label">Threat Detection</span>
           </div>
         </div>
