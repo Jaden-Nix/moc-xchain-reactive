@@ -216,13 +216,6 @@ MockPriceFeed: 0xE293955c98D37044400E71c445062d7cd967250c
 OriginRelay:   0x46ad513300d508FB234fefD3ec1aB4162C547A57
 ```
 
-### Next Step (When Lasna Available)
-```bash
-npx hardhat run scripts/deploy/02_deploy_reactive_lasna.ts --network lasna \
-  0xE293955c98D37044400E71c445062d7cd967250c \
-  0x46ad513300d508FB234fefD3ec1aB4162C547A57
-```
-
 ---
 
 ## Wallet Information

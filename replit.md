@@ -134,19 +134,7 @@ scripts/
 npm run dev    # Dashboard + API server
 ```
 
-### Vercel Deployment
-```bash
-npm i -g vercel
-vercel login
-vercel
-```
 
-**Environment Variables**: None needed! Uses public RPC endpoints.
-
-**After Deployment**:
-- Dashboard: https://your-project.vercel.app
-- Terminal works on Vercel (runs npm test, etc.)
-- MetaMask wallet connections work from any location
 
 ---
 
@@ -172,7 +160,6 @@ vercel
 - `COMPLETE_DEPLOYMENT_SUMMARY.md` - Detailed architecture and status
 - `REQUIREMENTS_VERIFIED.md` - Line-by-line code verification
 - `SUBMISSION_CHECKLIST.md` - Evidence checklist
-- `VERCEL_DEPLOYMENT.md` - Vercel deployment steps
 - `TERMINAL_GUIDE.md` - Terminal feature guide
 
 ---

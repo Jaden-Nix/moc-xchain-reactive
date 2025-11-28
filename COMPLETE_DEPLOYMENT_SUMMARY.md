@@ -188,11 +188,7 @@ Explorer: https://lasna-scan.rkt.ink/
 
 ---
 
-## 📋 YOUR WALLET
 
-```
-0x9Fa915353AA1e8F955f76D3a39497B8f1F38a273
-```
 
 ---
 
@@ -202,16 +198,7 @@ Explorer: https://lasna-scan.rkt.ink/
 - ✅ Sepolia (origin chain)
 - ✅ Lasna (reactive network)
 
-**Ready for hackathon submission!**
+
 
 ---
-
-## Quick Test Command
-
-To verify everything works after deployment:
-```bash
-npx hardhat run scripts/test/fresh-deploy-and-demo.ts --network hardhat
-```
-
-Expected output: All tests pass, prices flow correctly end-to-end.
 

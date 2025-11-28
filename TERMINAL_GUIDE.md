@@ -1,6 +1,6 @@
 # Terminal Feature Guide
 
-Your dashboard now includes an interactive terminal that allows you to run npm and hardhat commands directly from the UI.
+ dashboard  includes an interactive terminal that allows you to run npm and hardhat commands directly from the UI.
 
 ## Using the Terminal
 
@@ -25,4 +25,3 @@ Your dashboard now includes an interactive terminal that allows you to run npm a
 
 - Terminal history: Use UP/DOWN arrow keys to cycle through previous commands
 - Clear: Click the "Clear" button to clear terminal output
-- Full coverage: Works locally in development AND on Vercel deployment
