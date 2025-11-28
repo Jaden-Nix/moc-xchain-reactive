@@ -6,7 +6,7 @@
 
 ## Live Demo
 
-**Dashboard:** [https://moc-network.vercel.app](https://moc-network.vercel.app)
+**Dashboard:** [https://moc-xchain.replit.app](https://moc-xchain.replit.app)
 
 Test the complete cross-chain flow directly in your browser!
 
@@ -139,7 +139,7 @@ REACTIVE NETWORK (Lasna - 5318007)
 ## How to Test
 
 ### Using the Dashboard (Recommended)
-1. Go to [https://moc-network.vercel.app](https://moc-network.vercel.app)
+1. Go to [https://moc-xchain.replit.app](https://moc-xchain.replit.app)
 2. Connect MetaMask wallet
 3. Click "Read Latest Price" (no wallet needed)
 4. Click "Update Price to $2500" (needs Sepolia ETH)
@@ -172,7 +172,7 @@ This system is impossible without Reactive Contracts because:
 
 | Item | Status |
 |------|--------|
-| Live Dashboard | [moc-network.vercel.app](https://moc-network.vercel.app) |
+| Live Dashboard | [moc-xchain.replit.app](https://moc-xchain.replit.app) |
 | Sepolia Contracts | Deployed + Etherscan verified |
 | Lasna Contracts | Deployed + Configured |
 | Requirements 1-3 | 100% Complete |

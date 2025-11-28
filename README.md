@@ -5,13 +5,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue)](https://soliditylang.org/)
 [![Hardhat](https://img.shields.io/badge/Hardhat-2.19-orange)](https://hardhat.org/)
-[![Live Demo](https://img.shields.io/badge/Demo-Live-green)](https://moc-network.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-green)](https://moc-xchain.replit.app)
 
 ---
 
 ## Live Demo
 
-**Dashboard URL:** [https://moc-network.vercel.app](https://moc-network.vercel.app)
+**Dashboard URL:** [https://moc-xchain.replit.app](https://moc-xchain.replit.app)
 
 The interactive dashboard lets you:
 - Read prices from Sepolia MockPriceFeed
