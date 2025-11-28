@@ -5,7 +5,7 @@
 | Network | Purpose | Chain ID | RPC | Status |
 |---------|---------|----------|-----|--------|
 | Sepolia | Origin + Destination | 11155111 | Alchemy | ✅ DEPLOYED |
-| Lasna | Reactive Contract | 2024 | lasna-rpc.rkt.ink | 🔧 Ready |
+| Lasna | Reactive Contract | 2025 | lasna-rpc.rkt.ink | 🔧 Ready |
 
 ---
 

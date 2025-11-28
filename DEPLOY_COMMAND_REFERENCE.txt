@@ -54,7 +54,7 @@ Sepolia Chain (11155111):
   MockPriceFeed:      0xE293955c98D37044400E71c445062d7cd967250c
   OriginFeedRelay:    0x46ad513300d508FB234fefD3ec1aB4162C547A57
 
-Lasna Chain (2024):
+Lasna Chain (2025):
   PriceFeedReactor:   (waiting for network availability)
   DestinationFeedProxy: (waiting for network availability)
 

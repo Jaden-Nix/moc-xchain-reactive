@@ -2,10 +2,10 @@
 
 ## What is Lasna?
 
-**Lasna** = Reactive Network's **newer, more stable testnet** (launched July 28, 2024)
+**Lasna** = Reactive Network's **newer, more stable testnet** (launched July 28, 2025)
 - Replaced the older Kopli testnet
 - Better stability and faster finality
-- Chain ID: `2024` (standard, well-known)
+- Chain ID: `2025` (standard, well-known)
 - RPC: `https://lasna-rpc.rkt.ink`
 - Explorer: https://lasna-scan.rkt.ink
 
@@ -66,7 +66,7 @@ npx hardhat run scripts/test/workflow-sepolia-lasna.ts --network sepolia
 |-----------|---------|-------|
 | **Purpose** | Origin & Destination | Reactive Smart Contracts |
 | **RPC** | https://rpc.sepolia.org | https://lasna-rpc.rkt.ink |
-| **Chain ID** | 11155111 | 2024 |
+| **Chain ID** | 11155111 | 2025 |
 | **Explorer** | https://sepolia.etherscan.io | https://lasna-scan.rkt.ink |
 | **Faucet** | https://www.infura.io/faucet/sepolia | Same as Sepolia (via bridge) |
 | **System Contract** | N/A | 0x0000000000000000000000000000000000fffFfF |

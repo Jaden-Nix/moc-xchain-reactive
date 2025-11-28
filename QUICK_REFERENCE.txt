@@ -7,7 +7,7 @@ YOUR BALANCE: 0.2 SepETH ✅
 
 NETWORK INFO:
 - Sepolia RPC: https://rpc.sepolia.org (Chain 11155111)
-- Lasna RPC: https://lasna-rpc.rkt.ink (Chain 2024)
+- Lasna RPC: https://lasna-rpc.rkt.ink (Chain 2025)
 
 COMMAND 1: Deploy to Sepolia
 ------------------------------

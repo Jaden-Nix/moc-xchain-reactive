@@ -17,7 +17,7 @@
 **On Screen:**
 - Title: "MOC: Mirror-of-Chainlink"
 - Subtitle: "Cross-Chain Oracle Infrastructure with Reactive Contracts"
-- "Built for Reactive Bounties 2024"
+- "Built for Reactive Bounties 2025"
 
 ---
 
