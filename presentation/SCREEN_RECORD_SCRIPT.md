@@ -74,7 +74,7 @@
 - Wait for TX
 
 **SAY:**
-> "I'm updating the price. Confirming in MetaMask. This creates a new round on the origin chain. Round 9 with a fresh price. The OriginFeedRelay contract just emitted an event saying 'Hey, new price available.'"
+> "I'm updating the price. Confirming in My wallet. This creates a new round on the origin chain. Round 9 with a fresh price. The OriginFeedRelay contract just emitted an event saying 'Hey, new price available.'"
 
 ---
 
