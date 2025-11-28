@@ -90,8 +90,9 @@ export async function switchNetwork(chainId: number): Promise<{ success: boolean
     return { success: false, error: 'No wallet detected' }
   }
 
+  const ethereum = (window as any).ethereum
+  
   try {
-    const ethereum = (window as any).ethereum
     await ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: `0x${chainId.toString(16)}` }],
@@ -99,7 +100,27 @@ export async function switchNetwork(chainId: number): Promise<{ success: boolean
     return { success: true }
   } catch (error: any) {
     if (error.code === 4902) {
+      if (chainId === CHAIN_IDS.lasna) {
+        try {
+          await ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: `0x${chainId.toString(16)}`,
+              chainName: 'Reactive Network (Lasna)',
+              nativeCurrency: { name: 'REACT', symbol: 'REACT', decimals: 18 },
+              rpcUrls: ['https://lasna-rpc.rnk.dev'],
+              blockExplorerUrls: ['https://lasna.rnk.dev'],
+            }],
+          })
+          return { success: true }
+        } catch (addError: any) {
+          return { success: false, error: 'Could not add Lasna network to wallet. Please add it manually.' }
+        }
+      }
       return { success: false, error: 'Network not configured in wallet. Please add it manually.' }
+    }
+    if (error.code === 4001) {
+      return { success: false, error: 'You rejected the network switch request.' }
     }
     return { success: false, error: error.message }
   }
@@ -225,7 +246,14 @@ export async function testRelayPrice(
       txHash: receipt?.hash,
     }
   } catch (error: any) {
-    return { success: false, error: error.message }
+    const msg = error.message || ''
+    if (msg.includes('insufficient funds')) {
+      return { success: false, error: 'Insufficient Sepolia ETH for gas. Get free test ETH from a Sepolia faucet.' }
+    }
+    if (msg.includes('user rejected') || msg.includes('User denied')) {
+      return { success: false, error: 'Transaction was rejected in wallet.' }
+    }
+    return { success: false, error: `Relay failed: ${error.reason || error.message}` }
   }
 }
 
@@ -345,7 +373,13 @@ export async function testDestinationUpdate(
 
     const sepoliaProvider = getSepoliaProvider()
     const mockContract = new ethers.Contract(mockFeedAddr, MOCK_FEED_ABI, sepoliaProvider)
-    const latestData = await mockContract.latestRoundData()
+    
+    let latestData
+    try {
+      latestData = await mockContract.latestRoundData()
+    } catch (e) {
+      return { success: false, error: 'Could not read price from Sepolia. Try again in a moment.' }
+    }
 
     const switchResult = await switchNetwork(CHAIN_IDS.lasna)
     if (!switchResult.success) {
@@ -378,7 +412,17 @@ export async function testDestinationUpdate(
       txHash: receipt?.hash,
     }
   } catch (error: any) {
-    return { success: false, error: error.message }
+    const msg = error.message || ''
+    if (msg.includes('insufficient funds')) {
+      return { success: false, error: 'Insufficient REACT tokens for gas on Lasna network.' }
+    }
+    if (msg.includes('user rejected') || msg.includes('User denied')) {
+      return { success: false, error: 'Transaction was rejected in wallet.' }
+    }
+    if (msg.includes('not authorized') || msg.includes('Unauthorized')) {
+      return { success: false, error: 'Your wallet is not authorized as a relayer on the destination contract.' }
+    }
+    return { success: false, error: `Update failed: ${error.reason || error.message}` }
   }
 }
 
