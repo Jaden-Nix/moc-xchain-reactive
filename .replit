@@ -109,5 +109,14 @@ externalPort = 8008
 localPort = 45825
 externalPort = 5000
 
+[[ports]]
+localPort = 46441
+externalPort = 8081
+
 [nix]
 channel = "stable-25_05"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["node", "api/index.js"]
+build = ["npm", "run", "build"]
