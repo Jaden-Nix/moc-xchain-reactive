@@ -37,9 +37,11 @@ interface DeployedContracts {
 }
 
 const RPC_ENDPOINTS = {
-  sepolia: 'https://ethereum-sepolia-rpc.publicnode.com',
-  sepoliaFallback: 'https://rpc.sepolia.org',
+  sepolia: 'https://rpc.sepolia.org',
+  sepoliaFallback: 'https://ethereum-sepolia-rpc.publicnode.com',
   sepoliaBackup: 'https://sepolia.drpc.org',
+  sepoliaAnkr: 'https://rpc.ankr.com/eth_sepolia',
+  sepoliaBlast: 'https://sepolia.blast.io',
   lasna: 'https://lasna-rpc.rnk.dev',
   local: 'http://127.0.0.1:8545',
 }
@@ -133,6 +135,8 @@ const sepoliaRpcList = [
   RPC_ENDPOINTS.sepolia,
   RPC_ENDPOINTS.sepoliaFallback,
   RPC_ENDPOINTS.sepoliaBackup,
+  RPC_ENDPOINTS.sepoliaAnkr,
+  RPC_ENDPOINTS.sepoliaBlast,
 ]
 
 export function getSepoliaProvider(): JsonRpcProvider {
@@ -215,7 +219,20 @@ export async function testUpdatePrice(
       txHash: receipt?.hash,
     }
   } catch (error: any) {
-    return { success: false, error: error.message }
+    const msg = error.message || ''
+    if (msg.includes('user rejected') || msg.includes('User denied')) {
+      return { success: false, error: 'Transaction was rejected in wallet.' }
+    }
+    if (msg.includes('insufficient funds')) {
+      return { success: false, error: 'Insufficient Sepolia ETH for gas. Get some from a faucet.' }
+    }
+    if (msg.includes('HTTP Status code: -1') || msg.includes('could not coalesce') || msg.includes('UNKNOWN_ERROR')) {
+      return { success: false, error: 'Network connection issue. Check your internet and try again. You may also need to change the RPC in MetaMask settings.' }
+    }
+    if (msg.includes('network') || msg.includes('timeout') || msg.includes('failed to fetch')) {
+      return { success: false, error: 'Network error. Please check your connection and try again.' }
+    }
+    return { success: false, error: `Update failed: ${error.reason || error.message}` }
   }
 }
 
@@ -267,6 +284,12 @@ export async function testRelayPrice(
     }
     if (msg.includes('user rejected') || msg.includes('User denied')) {
       return { success: false, error: 'Transaction was rejected in wallet.' }
+    }
+    if (msg.includes('HTTP Status code: -1') || msg.includes('could not coalesce') || msg.includes('UNKNOWN_ERROR')) {
+      return { success: false, error: 'Network connection issue. Check your internet and try again.' }
+    }
+    if (msg.includes('network') || msg.includes('timeout') || msg.includes('failed to fetch')) {
+      return { success: false, error: 'Network error. Please check your connection and try again.' }
     }
     return { success: false, error: `Relay failed: ${error.reason || error.message}` }
   }
