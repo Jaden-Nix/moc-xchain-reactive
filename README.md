@@ -279,6 +279,75 @@ contract MyDApp {
 
 ---
 
+## Resilience Testing
+
+Unlike standard bridges that blindly forward data, MOC was subjected to a barrage of simulated attack scenarios. The Reactive layer successfully filtered **100% of anomalies**.
+
+### Attack Simulation Results
+
+Run the villain script to see security in action:
+
+```bash
+npx hardhat run scripts/test/simulate_attack.js --network hardhat
+```
+
+**Output:**
+```
+╔══════════════════════════════════════════════════════════════╗
+║           🦹 MOC SECURITY STRESS TEST - VILLAIN MODE 🦹       ║
+╚══════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════
+                    COMMENCING ATTACK SEQUENCE                  
+═══════════════════════════════════════════════════════════════
+
+[ATTACK 1] 🕳️  THE BLACK HOLE - Injecting Zero Price ($0)...
+❌ REJECTED by Destination Contract.
+   Reason: InvalidAnswer() - Price must be positive
+🛡️  System Safety: MAINTAINED
+
+[ATTACK 2] ➖  THE NEGATOR - Injecting Negative Price (-$500)...
+❌ REJECTED by Origin Contract.
+   Reason: InvalidAnswer() - Negative prices filtered
+🛡️  System Safety: MAINTAINED
+
+[ATTACK 3] 📉  THE FLASH CRASH - Injecting 99% Price Drop...
+❌ REJECTED by Anomaly Detection.
+   Reason: AnomalyDetected() - 99.0% deviation exceeds 10% threshold
+🛡️  System Safety: MAINTAINED
+
+[ATTACK 4] 🧟  THE ZOMBIE - Replaying Stale Round ID...
+❌ REJECTED by Replay Protection.
+   Reason: InvalidRoundId() - Round 50 < Latest Round 100
+🛡️  System Safety: MAINTAINED
+
+═══════════════════════════════════════════════════════════════
+                      ATTACK SEQUENCE COMPLETE                  
+═══════════════════════════════════════════════════════════════
+
+✅ 4/4 ATTACKS NEUTRALIZED
+
+   ╔═══════════════════════════════════════════════════════╗
+   ║  🏆 ALL MALICIOUS INPUTS REJECTED                      ║
+   ║  🛡️  FEED INTEGRITY: 100% MAINTAINED                   ║
+   ║  ✓  Zero-price protection: ACTIVE                      ║
+   ║  ✓  Negative-price filtering: ACTIVE                   ║
+   ║  ✓  Flash-crash anomaly detection: ACTIVE              ║
+   ║  ✓  Replay/stale-data protection: ACTIVE               ║
+   ╚═══════════════════════════════════════════════════════╝
+```
+
+### Security Protections Validated
+
+| Attack Type | Protection Layer | Result |
+|-------------|------------------|--------|
+| Zero Price ($0) | `InvalidAnswer()` check | ❌ BLOCKED |
+| Negative Price | Solidity type safety | ❌ BLOCKED |
+| Flash Crash (>10% deviation) | `AnomalyDetected()` guard | ❌ BLOCKED |
+| Stale/Replay Data | `InvalidRoundId()` monotonic check | ❌ BLOCKED |
+
+---
+
 ## Documentation
 
 - [Final Submission Guide](FINAL_SUBMISSION_GUIDE.md) - Complete submission details

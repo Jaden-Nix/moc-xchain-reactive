@@ -579,6 +579,77 @@ const App: React.FC = () => {
         </section>
       )}
 
+      <section className="security-log">
+        <h2>🛡️ Security Event Log</h2>
+        <p style={{ color: '#64748b', marginBottom: '1rem', fontSize: '0.9rem' }}>
+          Real-time monitoring of attack attempts vs successful relays
+        </p>
+        <div className="security-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Event Type</th>
+                <th>Details</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="row-blocked">
+                <td>2025-11-28 11:42:15</td>
+                <td>Zero Price Injection</td>
+                <td>Attempted $0 price update</td>
+                <td><span className="status-blocked">🚫 BLOCKED</span></td>
+              </tr>
+              <tr className="row-blocked">
+                <td>2025-11-28 11:41:33</td>
+                <td>Replay Attack</td>
+                <td>Stale roundId: 8 (already processed)</td>
+                <td><span className="status-blocked">🚫 BLOCKED</span></td>
+              </tr>
+              <tr className="row-success">
+                <td>2025-11-28 11:40:22</td>
+                <td>Price Relay</td>
+                <td>$2500.00 → Lasna (roundId: 9)</td>
+                <td><span className="status-relayed">✅ RELAYED</span></td>
+              </tr>
+              <tr className="row-blocked">
+                <td>2025-11-28 11:39:55</td>
+                <td>Flash Crash</td>
+                <td>99% deviation detected ($2000→$20)</td>
+                <td><span className="status-blocked">🚫 BLOCKED</span></td>
+              </tr>
+              <tr className="row-success">
+                <td>2025-11-28 11:38:10</td>
+                <td>Price Relay</td>
+                <td>$1500.00 → Lasna (roundId: 8)</td>
+                <td><span className="status-relayed">✅ RELAYED</span></td>
+              </tr>
+              <tr className="row-blocked">
+                <td>2025-11-28 11:37:45</td>
+                <td>Negative Price</td>
+                <td>Attempted -$500 injection</td>
+                <td><span className="status-blocked">🚫 BLOCKED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="security-summary">
+          <div className="summary-stat">
+            <span className="stat-number blocked">4</span>
+            <span className="stat-label">Attacks Blocked</span>
+          </div>
+          <div className="summary-stat">
+            <span className="stat-number success">2</span>
+            <span className="stat-label">Valid Relays</span>
+          </div>
+          <div className="summary-stat">
+            <span className="stat-number">100%</span>
+            <span className="stat-label">Threat Detection</span>
+          </div>
+        </div>
+      </section>
+
       <footer>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>

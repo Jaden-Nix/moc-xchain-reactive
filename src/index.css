@@ -590,6 +590,112 @@ footer {
   }
 }
 
+/* Security Event Log */
+.security-log {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.security-log h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #e2e8f0;
+}
+
+.security-table {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.security-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.security-table th {
+  text-align: left;
+  padding: 0.75rem;
+  background: rgba(30, 41, 59, 0.8);
+  color: #94a3b8;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.security-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+}
+
+.security-table tr.row-blocked {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.security-table tr.row-success {
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.security-table tr:hover {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.status-blocked {
+  color: #ef4444;
+  font-weight: 600;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.status-relayed {
+  color: #22c55e;
+  font-weight: 600;
+  background: rgba(34, 197, 94, 0.15);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.security-summary {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.summary-stat {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #60a5fa;
+  line-height: 1;
+}
+
+.stat-number.blocked {
+  color: #ef4444;
+}
+
+.stat-number.success {
+  color: #22c55e;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+  display: block;
+}
+
 @media (max-width: 480px) {
   body {
     padding: 0.4rem;
