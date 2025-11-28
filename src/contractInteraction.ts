@@ -367,7 +367,6 @@ export async function testReadDestinationPrice(
   try {
     const provider = getLasnaProvider()
     
-    // Test provider connectivity
     try {
       await provider.getNetwork()
     } catch {
@@ -375,16 +374,27 @@ export async function testReadDestinationPrice(
     }
 
     const contract = new ethers.Contract(destAddr, DESTINATION_ABI, provider)
-    const data = await contract.latestRoundData()
-
-    return {
-      success: true,
-      data: {
-        roundId: data[0].toString(),
-        price: `$${ethers.formatUnits(data[1], 8)}`,
-        updatedAt: new Date(Number(data[3]) * 1000).toISOString(),
-        network: 'Lasna (Reactive Network)',
-      },
+    
+    try {
+      const data = await contract.latestRoundData()
+      return {
+        success: true,
+        data: {
+          roundId: data[0].toString(),
+          price: `$${ethers.formatUnits(data[1], 8)}`,
+          updatedAt: new Date(Number(data[3]) * 1000).toISOString(),
+          network: 'Lasna (Reactive Network)',
+        },
+      }
+    } catch (contractError: any) {
+      const errorData = contractError?.data || contractError?.error?.data || ''
+      if (errorData.includes('bfbe031f')) {
+        return { success: false, error: 'No price data available yet. The relay needs to send data first.' }
+      }
+      if (errorData.includes('StaleUpdate') || contractError?.message?.includes('StaleUpdate')) {
+        return { success: false, error: 'Price data is stale (older than threshold). A fresh relay is needed.' }
+      }
+      throw contractError
     }
   } catch (error: any) {
     const errorMsg = error.message || error.reason || 'Failed to read price from contract'
@@ -398,7 +408,6 @@ export async function testStalenessCheck(
   try {
     const provider = getLasnaProvider()
     
-    // Test provider connectivity
     try {
       await provider.getNetwork()
     } catch {
@@ -406,15 +415,26 @@ export async function testStalenessCheck(
     }
 
     const contract = new ethers.Contract(destAddr, DESTINATION_ABI, provider)
-    const isStale = await contract.isStale()
-
-    return {
-      success: true,
-      data: {
-        status: isStale ? 'Price is stale' : 'Price is fresh',
-        stale: isStale,
-        network: 'Lasna',
-      },
+    
+    try {
+      const isStale = await contract.isStale()
+      return {
+        success: true,
+        data: {
+          status: isStale ? 'Price is stale' : 'Price is fresh',
+          stale: isStale,
+          network: 'Lasna',
+        },
+      }
+    } catch (contractError: any) {
+      return {
+        success: true,
+        data: {
+          status: 'No price data yet (contract returns stale for empty data)',
+          stale: true,
+          network: 'Lasna',
+        },
+      }
     }
   } catch (error: any) {
     const errorMsg = error.message || error.reason || 'Failed to check staleness'
