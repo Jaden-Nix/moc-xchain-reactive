@@ -247,6 +247,20 @@ export async function testRelayPrice(
     }
   } catch (error: any) {
     const msg = error.message || ''
+    const errorData = error.data || error?.error?.data || ''
+    
+    if (errorData.includes('bfbe031f') || msg.includes('InvalidRoundId')) {
+      return { success: false, error: 'No new price round available. The price feed has not been updated yet. Try updating the MockPriceFeed first.' }
+    }
+    if (errorData.includes('StaleUpdate') || msg.includes('StaleUpdate')) {
+      return { success: false, error: 'Price data is stale (over 1 hour old). The mock feed needs a fresh update.' }
+    }
+    if (errorData.includes('UpdateTooFrequent') || msg.includes('UpdateTooFrequent')) {
+      return { success: false, error: 'Please wait 60 seconds between relay calls (rate limiting).' }
+    }
+    if (errorData.includes('InvalidPrice') || msg.includes('InvalidPrice')) {
+      return { success: false, error: 'Price is invalid (zero or negative). Update the MockPriceFeed with a valid price first.' }
+    }
     if (msg.includes('insufficient funds')) {
       return { success: false, error: 'Insufficient Sepolia ETH for gas. Get free test ETH from a Sepolia faucet.' }
     }
