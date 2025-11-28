@@ -36,7 +36,8 @@ interface DeployedContracts {
 }
 
 const RPC_ENDPOINTS = {
-  sepolia: 'https://rpc.sepolia.org',
+  sepolia: 'https://eth-sepolia.public.blastapi.io',
+  sepoliaFallback: 'https://rpc.sepolia.org',
   lasna: 'https://lasna-rpc.rnk.dev',
   local: 'http://127.0.0.1:8545',
 }
@@ -105,14 +106,22 @@ export async function switchNetwork(chainId: number): Promise<{ success: boolean
 
 export function getSepoliaProvider(): JsonRpcProvider {
   if (!sepoliaProvider) {
-    sepoliaProvider = new JsonRpcProvider(RPC_ENDPOINTS.sepolia)
+    try {
+      sepoliaProvider = new JsonRpcProvider(RPC_ENDPOINTS.sepolia, 11155111, { staticNetwork: true })
+    } catch {
+      sepoliaProvider = new JsonRpcProvider(RPC_ENDPOINTS.sepoliaFallback, 11155111, { staticNetwork: true })
+    }
   }
   return sepoliaProvider
 }
 
 export function getLasnaProvider(): JsonRpcProvider {
   if (!lasnaProvider) {
-    lasnaProvider = new JsonRpcProvider(RPC_ENDPOINTS.lasna)
+    try {
+      lasnaProvider = new JsonRpcProvider(RPC_ENDPOINTS.lasna, 5318007, { staticNetwork: true })
+    } catch {
+      lasnaProvider = new JsonRpcProvider(RPC_ENDPOINTS.lasna, 5318007, { staticNetwork: true })
+    }
   }
   return lasnaProvider
 }
@@ -208,6 +217,14 @@ export async function testReadLatestPrice(
 ): Promise<ContractResult> {
   try {
     const provider = getSepoliaProvider()
+    
+    // Test provider connectivity
+    try {
+      await provider.getNetwork()
+    } catch {
+      return { success: false, error: 'Unable to connect to Sepolia RPC. Network may be temporarily unavailable.' }
+    }
+
     const contract = new ethers.Contract(mockFeedAddr, MOCK_FEED_ABI, provider)
     const data = await contract.latestRoundData()
 
@@ -221,7 +238,8 @@ export async function testReadLatestPrice(
       },
     }
   } catch (error: any) {
-    return { success: false, error: error.message }
+    const errorMsg = error.message || error.reason || 'Failed to read price from contract'
+    return { success: false, error: errorMsg }
   }
 }
 
@@ -344,6 +362,14 @@ export async function testReadDestinationPrice(
 ): Promise<ContractResult> {
   try {
     const provider = getLasnaProvider()
+    
+    // Test provider connectivity
+    try {
+      await provider.getNetwork()
+    } catch {
+      return { success: false, error: 'Unable to connect to Lasna RPC. Network may be temporarily unavailable.' }
+    }
+
     const contract = new ethers.Contract(destAddr, DESTINATION_ABI, provider)
     const data = await contract.latestRoundData()
 
@@ -357,7 +383,8 @@ export async function testReadDestinationPrice(
       },
     }
   } catch (error: any) {
-    return { success: false, error: error.message }
+    const errorMsg = error.message || error.reason || 'Failed to read price from contract'
+    return { success: false, error: errorMsg }
   }
 }
 
@@ -366,6 +393,14 @@ export async function testStalenessCheck(
 ): Promise<ContractResult> {
   try {
     const provider = getLasnaProvider()
+    
+    // Test provider connectivity
+    try {
+      await provider.getNetwork()
+    } catch {
+      return { success: false, error: 'Unable to connect to Lasna RPC. Network may be temporarily unavailable.' }
+    }
+
     const contract = new ethers.Contract(destAddr, DESTINATION_ABI, provider)
     const isStale = await contract.isStale()
 
@@ -378,6 +413,7 @@ export async function testStalenessCheck(
       },
     }
   } catch (error: any) {
-    return { success: false, error: error.message }
+    const errorMsg = error.message || error.reason || 'Failed to check staleness'
+    return { success: false, error: errorMsg }
   }
 }
