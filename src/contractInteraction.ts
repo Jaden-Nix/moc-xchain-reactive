@@ -472,8 +472,8 @@ export async function testDestinationUpdate(
     if (msg.includes('Unauthorized') || errorData.includes('Unauthorized')) {
       return { success: false, error: 'Your wallet is not authorized as a relayer. Only the contract owner can update prices.' }
     }
-    if (msg.includes('InvalidRoundId') || errorData.includes('InvalidRoundId')) {
-      return { success: false, error: 'This price round was already sent. Update the MockPriceFeed first to create a new round.' }
+    if (msg.includes('InvalidRoundId') || errorData.includes('InvalidRoundId') || errorData.includes('0xbfbe031f')) {
+      return { success: false, error: 'This price round was already sent to destination. Update the MockPriceFeed first to create a new round, then try again.' }
     }
     if (msg.includes('InvalidAnswer') || errorData.includes('InvalidAnswer')) {
       return { success: false, error: 'Price data is invalid or too old. Update the MockPriceFeed with a fresh price.' }
