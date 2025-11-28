@@ -81,17 +81,7 @@
 
 ---
 
-## [1:50-2:00] SCROLL DOWN TO SEE ATTACK LOG
-
-**DO:**
-- Scroll down to see the "Security Event Log" table
-
-**SAY:**
-> "You'll notice there's a Security Event Log below. This is going to get interesting."
-
----
-
-## [2:00-2:50] RUN ATTACK SIMULATION (THE KEY MOMENT)
+## [1:50-2:50] RUN ATTACK SIMULATION (THE KEY MOMENT)
 
 **DO:**
 - Scroll to the bottom
@@ -101,27 +91,15 @@
 - Wait for the FULL output to complete (it takes ~10-15 seconds)
 
 **SAY (while it runs):**
-> "Now watch what happens when I run our Villain Mode attack simulation. This script tries to inject four different types of malicious data into the destination contract. Pay attention to what gets rejected."
+> "Now watch what happens when I run our Villain Mode attack simulation. This script tries to inject four different types of malicious data directly into the destination smart contract. This is NOT simulated—it's real contract behavior. Watch what gets rejected."
 
 *Let the output run. Read it aloud as it appears:*
 
-> "Attack 1: Zero price injection - REJECTED. Attack 2: Negative price - REJECTED. Attack 3: Flash crash, a 99% price drop - REJECTED. Attack 4: Replay attack with old data - REJECTED."
+> "Attack 1: Zero price injection - REJECTED with InvalidAnswer(). Attack 2: Negative price - REJECTED with InvalidAnswer(). Attack 3: Flash crash, a 99% price drop - REJECTED with DeviationTooHigh(). Attack 4: Replay attack with old data - REJECTED with InvalidRoundId()."
 
-*After it finishes:*
+*After it finishes, point at the summary:*
 
-> "Four attacks. Four rejections. Four times the smart contract said NO. This is real contract behavior, not a simulation. The firewall worked."
-
----
-
-## [2:50-3:10] SHOW THE SECURITY EVENT LOG UPDATED
-
-**DO:**
-- Close the terminal (click "Close Terminal" button)
-- Scroll up to look at the Security Event Log table
-- Point at the red "BLOCKED" rows
-
-**SAY:**
-> "Look at the Security Event Log. Each attack attempt is logged in red - BLOCKED. The contract caught every single one. This is what a working circuit breaker looks like."
+> "Look at this: 4 out of 4 attacks neutralized. The smart contract is catching every attack, returning specific error codes. This isn't logging or filtering—this is the actual contract reverting malicious transactions. That's real security."
 
 ---
 
@@ -172,10 +150,9 @@
 | 0:50 | Click "Read Latest Price" | Show $1500 starting price |
 | 1:10 | Click "Update Price" → MetaMask confirm | Update to $2500 |
 | 1:30 | Click "Relay Price" → MetaMask confirm | Relay to destination chain |
-| 1:50 | Scroll to see Security Event Log | Show where attacks will be logged |
-| 2:00 | Click "Open Terminal" | Prepare for attack demo |
-| 2:00 | Type & run attack script | Run: `npx hardhat run scripts/test/simulate_attack.js --network hardhat` |
-| 2:50 | Close terminal, look at log | Show red BLOCKED rows |
+| 1:50 | Click "Open Terminal" | Prepare for attack demo |
+| 1:50 | Type & run attack script | Run: `npx hardhat run scripts/test/simulate_attack.js --network hardhat` |
+| 2:50 | Terminal output complete | Read aloud: Attack 1 REJECTED, Attack 2 REJECTED, etc. |
 | 3:10 | Click "Read Destination Price" | Verify price is still $2500 |
 | 3:30 | Point at contracts | Explain operational maturity |
 | 4:00 | Close out | Final closing statement |
