@@ -8,7 +8,11 @@ interface TerminalViewerProps {
 const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
   const [output, setOutput] = useState<string[]>([])
   const [isRunning, setIsRunning] = useState(false)
+  const [input, setInput] = useState('')
+  const [commandHistory, setCommandHistory] = useState<string[]>([])
+  const [historyIndex, setHistoryIndex] = useState(-1)
   const terminalRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (terminalRef.current) {
@@ -16,13 +20,26 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
     }
   }, [output])
 
-  const runTests = async () => {
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isOpen])
+
+  const runCommand = async (command: string) => {
+    if (!command.trim()) return
+
+    setOutput((prev) => [...prev, `$ ${command}`])
     setIsRunning(true)
-    setOutput(['$ npm run test', ''])
+    setCommandHistory((prev) => [...prev, command])
+    setHistoryIndex(-1)
+    setInput('')
 
     try {
-      const response = await fetch('/api/run-test', {
+      const response = await fetch('/api/run-command', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command }),
       })
 
       if (!response.ok) {
@@ -49,16 +66,47 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
         setOutput((prev) => [...prev, ...lines.filter((line) => line.length > 0)])
       }
 
-      setOutput((prev) => [...prev, '', '✓ Tests completed'])
+      setOutput((prev) => [...prev, ''])
     } catch (error: any) {
       setOutput((prev) => [...prev, `Error: ${error.message}`])
     }
 
     setIsRunning(false)
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      runCommand(input)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      const newIndex = historyIndex + 1
+      if (newIndex < commandHistory.length) {
+        setHistoryIndex(newIndex)
+        setInput(commandHistory[commandHistory.length - 1 - newIndex])
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      const newIndex = historyIndex - 1
+      if (newIndex >= 0) {
+        setHistoryIndex(newIndex)
+        setInput(commandHistory[commandHistory.length - 1 - newIndex])
+      } else if (newIndex < 0) {
+        setHistoryIndex(-1)
+        setInput('')
+      }
+    }
   }
 
   const clearTerminal = () => {
     setOutput([])
+  }
+
+  const runTests = async () => {
+    runCommand('npm run test')
   }
 
   if (!isOpen) return null
@@ -151,11 +199,48 @@ const TerminalViewer: React.FC<TerminalViewerProps> = ({ isOpen, onClose }) => {
           wordBreak: 'break-word',
         }}
       >
-        {output.map((line, idx) => (
-          <div key={idx}>
-            {line || '\n'}
-          </div>
-        ))}
+        {output.length === 0 ? (
+          <div style={{ color: '#64748b' }}>Type a command and press Enter...</div>
+        ) : (
+          output.map((line, idx) => (
+            <div key={idx}>
+              {line || '\n'}
+            </div>
+          ))
+        )}
+      </div>
+
+      <div
+        style={{
+          borderTop: '1px solid #475569',
+          padding: '0.75rem',
+          background: '#0f172a',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}
+      >
+        <span style={{ color: '#10b981' }}>$</span>
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={isRunning}
+          placeholder="Enter command (e.g., npm run compile, npm run test)"
+          style={{
+            flex: 1,
+            background: '#1e293b',
+            color: '#10b981',
+            border: 'none',
+            padding: '0.5rem',
+            fontFamily: 'Courier New, monospace',
+            fontSize: '0.875rem',
+            outline: 'none',
+            opacity: isRunning ? 0.5 : 1,
+          }}
+        />
       </div>
     </div>
   )
