@@ -696,6 +696,9 @@
         let current = 1;
         const total = document.querySelectorAll('.slide').length;
         document.getElementById('total').textContent = total;
+        
+        let touchStartX = 0;
+        let touchEndX = 0;
 
         function show() {
             document.querySelectorAll('.slide').forEach((s, i) => {
@@ -719,10 +722,26 @@
             }
         }
 
+        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') next();
             if (e.key === 'ArrowLeft') prev();
         });
+
+        // Touch swipe navigation for mobile
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) {
+                next(); // Swipe left = next
+            }
+            if (touchEndX - touchStartX > 50) {
+                prev(); // Swipe right = prev
+            }
+        }, false);
 
         show();
     </script>
