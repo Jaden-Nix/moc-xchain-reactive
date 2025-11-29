@@ -25,16 +25,17 @@
         }
 
         html, body {
-            width: 100%;
-            height: 100%;
             font-family: 'Space Grotesk', sans-serif;
             background: var(--bg-dark);
             color: var(--text-primary);
+            height: 100%;
+            width: 100%;
         }
 
         body {
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .background {
@@ -44,7 +45,7 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            overflow: hidden;
+            pointer-events: none;
         }
 
         .gradient-orb {
@@ -105,28 +106,23 @@
             pointer-events: none;
         }
 
-        .slides-wrapper {
+        .slides-container {
             flex: 1;
             width: 100%;
-            position: relative;
-            overflow: hidden;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: y mandatory;
         }
 
         .slide {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 40px 30px;
-        }
-
-        .slide.active {
-            opacity: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
         }
 
         @media (min-width: 768px) {
@@ -135,31 +131,31 @@
             }
         }
 
-        .slide-inner {
+        .slide-content {
             width: 100%;
             max-width: 1400px;
-            margin: 0 auto;
-            min-height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-bottom: 60px;
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .mega-title {
             font-size: 3rem;
             font-weight: 700;
-            line-height: 1;
-            margin-bottom: 20px;
             background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 50%, var(--accent-green) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 15px;
         }
 
         @media (min-width: 768px) {
             .mega-title {
-                font-size: 6rem;
+                font-size: 5rem;
+                margin-bottom: 20px;
             }
         }
 
@@ -168,11 +164,13 @@
             color: var(--text-secondary);
             font-weight: 300;
             letter-spacing: 2px;
+            margin-bottom: 20px;
         }
 
         @media (min-width: 768px) {
             .subtitle {
                 font-size: 1.8rem;
+                margin-bottom: 30px;
             }
         }
 
@@ -182,25 +180,20 @@
             margin-bottom: 30px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         @media (min-width: 768px) {
             .section-title {
-                font-size: 3.5rem;
-                margin-bottom: 50px;
-                gap: 20px;
-            }
-        }
-
-        .section-title .icon {
-            font-size: 2rem;
-        }
-
-        @media (min-width: 768px) {
-            .section-title .icon {
                 font-size: 3rem;
+                margin-bottom: 40px;
+                gap: 15px;
             }
+        }
+
+        .section-title.center {
+            justify-content: center;
+            text-align: center;
         }
 
         .glass-card {
@@ -211,13 +204,12 @@
             padding: 20px;
             margin: 12px 0;
             position: relative;
-            overflow: hidden;
         }
 
         @media (min-width: 768px) {
             .glass-card {
-                border-radius: 24px;
-                padding: 35px;
+                border-radius: 20px;
+                padding: 30px;
                 margin: 15px 0;
             }
         }
@@ -235,17 +227,14 @@
         .card-title {
             font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 8px;
+            color: inherit;
         }
 
         @media (min-width: 768px) {
             .card-title {
-                font-size: 1.4rem;
-                margin-bottom: 12px;
-                gap: 12px;
+                font-size: 1.3rem;
+                margin-bottom: 10px;
             }
         }
 
@@ -273,116 +262,78 @@
 
         @media (min-width: 768px) {
             .card-text {
-                font-size: 1.15rem;
+                font-size: 1.1rem;
                 line-height: 1.7;
             }
         }
 
-        .highlight-blue { color: var(--accent-blue); font-weight: 600; }
         .highlight-green { color: var(--accent-green); font-weight: 600; }
         .highlight-red { color: var(--accent-red); font-weight: 600; }
-        .highlight-purple { color: var(--accent-purple); font-weight: 600; }
+        .highlight-blue { color: var(--accent-blue); font-weight: 600; }
 
-        .flow-container {
+        .flow-row {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 15px;
-            margin: 25px 0;
+            margin: 20px 0;
             flex-wrap: wrap;
-            flex-direction: column;
         }
 
         @media (min-width: 768px) {
-            .flow-container {
-                flex-direction: row;
-                gap: 30px;
-                margin: 40px 0;
+            .flow-row {
+                gap: 25px;
+                margin: 30px 0;
             }
         }
 
-        .flow-node {
+        .flow-box {
             background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
             border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 16px;
-            padding: 20px 25px;
+            border-radius: 12px;
+            padding: 15px 20px;
             text-align: center;
-            min-width: 180px;
+            min-width: 140px;
         }
 
         @media (min-width: 768px) {
-            .flow-node {
-                border-radius: 20px;
-                padding: 30px 40px;
-                min-width: 220px;
+            .flow-box {
+                border-radius: 16px;
+                padding: 20px 30px;
+                min-width: 180px;
             }
         }
 
-        .flow-node .node-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        @media (min-width: 768px) {
-            .flow-node .node-icon {
-                font-size: 2.5rem;
-                margin-bottom: 15px;
-            }
-        }
-
-        .flow-node .node-title {
-            font-size: 1rem;
+        .flow-box .label {
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        @media (min-width: 768px) {
-            .flow-node .node-title {
-                font-size: 1.3rem;
-                margin-bottom: 8px;
-            }
-        }
-
-        .flow-node .node-sub {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-        }
-
-        @media (min-width: 768px) {
-            .flow-node .node-sub {
-                font-size: 0.95rem;
-            }
-        }
-
-        .flow-arrow {
-            font-size: 1.5rem;
             color: var(--accent-blue);
         }
 
         @media (min-width: 768px) {
-            .flow-arrow {
-                font-size: 2.5rem;
+            .flow-box .label {
+                font-size: 1.1rem;
             }
         }
 
         .feature-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 15px;
+            gap: 12px;
             margin: 20px 0;
         }
 
         @media (min-width: 640px) {
             .feature-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
+                gap: 15px;
             }
         }
 
         @media (min-width: 1024px) {
             .feature-grid {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 25px;
+                gap: 20px;
                 margin: 30px 0;
             }
         }
@@ -390,42 +341,41 @@
         .feature-box {
             background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 18px;
             text-align: center;
         }
 
         @media (min-width: 768px) {
             .feature-box {
-                border-radius: 20px;
-                padding: 30px;
+                border-radius: 16px;
+                padding: 25px;
             }
         }
 
         .feature-icon {
             font-size: 2rem;
-            margin-bottom: 12px;
-            display: inline-block;
+            margin-bottom: 10px;
         }
 
         @media (min-width: 768px) {
             .feature-icon {
-                font-size: 3rem;
-                margin-bottom: 20px;
+                font-size: 2.5rem;
+                margin-bottom: 12px;
             }
         }
 
         .feature-title {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 8px;
             color: var(--accent-blue);
+            margin-bottom: 6px;
         }
 
         @media (min-width: 768px) {
             .feature-title {
-                font-size: 1.1rem;
-                margin-bottom: 10px;
+                font-size: 1rem;
+                margin-bottom: 8px;
             }
         }
 
@@ -437,157 +387,152 @@
 
         @media (min-width: 768px) {
             .feature-desc {
-                font-size: 0.95rem;
-                line-height: 1.6;
+                font-size: 0.9rem;
             }
         }
 
         .attack-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 15px;
+            gap: 12px;
             margin: 20px 0;
         }
 
         @media (min-width: 640px) {
             .attack-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
+                gap: 15px;
             }
         }
 
         @media (min-width: 1024px) {
             .attack-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 25px;
+                gap: 20px;
                 margin: 30px 0;
             }
         }
 
-        .attack-card {
+        .attack-box {
             background: linear-gradient(135deg, rgba(255, 71, 87, 0.1) 0%, rgba(255, 71, 87, 0.02) 100%);
             border: 1px solid rgba(255, 71, 87, 0.2);
-            border-radius: 14px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 18px;
             position: relative;
         }
 
         @media (min-width: 768px) {
-            .attack-card {
-                border-radius: 20px;
-                padding: 30px;
+            .attack-box {
+                border-radius: 16px;
+                padding: 25px;
             }
         }
 
-        .attack-card .attack-num {
+        .attack-num {
             position: absolute;
-            top: 12px;
-            right: 15px;
-            font-size: 2rem;
+            top: 10px;
+            right: 12px;
+            font-size: 1.8rem;
             font-weight: 700;
             color: rgba(255, 71, 87, 0.2);
         }
 
         @media (min-width: 768px) {
-            .attack-card .attack-num {
-                top: 20px;
-                right: 25px;
-                font-size: 3rem;
+            .attack-num {
+                top: 15px;
+                right: 20px;
+                font-size: 2.5rem;
             }
         }
 
-        .attack-card .attack-title {
+        .attack-title {
             color: var(--accent-red);
             font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         @media (min-width: 768px) {
-            .attack-card .attack-title {
-                font-size: 1.2rem;
-                margin-bottom: 10px;
+            .attack-title {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
             }
         }
 
-        .attack-card .attack-desc {
+        .attack-desc {
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
         }
 
         @media (min-width: 768px) {
-            .attack-card .attack-desc {
-                font-size: 1rem;
-                margin-bottom: 15px;
+            .attack-desc {
+                font-size: 0.95rem;
+                margin-bottom: 12px;
             }
         }
 
-        .attack-card .attack-result {
+        .blocked-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: rgba(0, 255, 136, 0.1);
             border: 1px solid rgba(0, 255, 136, 0.3);
             border-radius: 50px;
-            padding: 6px 12px;
+            padding: 5px 12px;
             font-size: 0.8rem;
             color: var(--accent-green);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         @media (min-width: 768px) {
-            .attack-card .attack-result {
-                gap: 8px;
-                padding: 8px 16px;
-                font-size: 0.9rem;
+            .blocked-badge {
+                padding: 6px 14px;
+                font-size: 0.85rem;
             }
         }
 
-        .stats-row {
+        .stats {
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 40px;
             margin: 30px 0;
             flex-wrap: wrap;
         }
 
         @media (min-width: 768px) {
-            .stats-row {
-                gap: 60px;
-                margin: 50px 0;
+            .stats {
+                gap: 80px;
+                margin: 40px 0;
             }
         }
 
-        .stat-box {
+        .stat {
             text-align: center;
         }
 
-        .stat-number {
+        .stat-num {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--accent-green);
+            margin-bottom: 5px;
         }
 
         @media (min-width: 768px) {
-            .stat-number {
-                font-size: 5rem;
+            .stat-num {
+                font-size: 4rem;
+                margin-bottom: 10px;
             }
         }
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-top: 8px;
+            font-size: 0.9rem;
         }
 
         @media (min-width: 768px) {
             .stat-label {
-                font-size: 1.2rem;
-                margin-top: 10px;
+                font-size: 1.1rem;
             }
         }
 
@@ -601,63 +546,44 @@
         @media (min-width: 768px) {
             .contract-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 30px;
+                gap: 25px;
                 margin: 30px 0;
             }
         }
 
-        .contract-card {
+        .contract-box {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 18px;
             backdrop-filter: blur(20px);
         }
 
         @media (min-width: 768px) {
-            .contract-card {
-                border-radius: 20px;
-                padding: 30px;
+            .contract-box {
+                border-radius: 16px;
+                padding: 25px;
             }
         }
 
-        .contract-card.sepolia {
+        .contract-box.sep {
             border-top: 3px solid var(--accent-blue);
         }
 
-        .contract-card.lasna {
+        .contract-box.las {
             border-top: 3px solid var(--accent-purple);
         }
 
-        .contract-card .chain-name {
-            font-size: 1.2rem;
+        .contract-chain {
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 12px;
         }
 
         @media (min-width: 768px) {
-            .contract-card .chain-name {
-                font-size: 1.5rem;
-                margin-bottom: 20px;
-                gap: 12px;
-            }
-        }
-
-        .contract-card .chain-badge {
-            background: rgba(0, 212, 255, 0.2);
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            color: var(--accent-blue);
-        }
-
-        @media (min-width: 768px) {
-            .contract-card .chain-badge {
-                padding: 4px 12px;
-                font-size: 0.8rem;
+            .contract-chain {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
             }
         }
 
@@ -665,44 +591,35 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             gap: 10px;
+            font-size: 0.85rem;
         }
 
         .contract-item:last-child {
             border-bottom: none;
         }
 
-        .contract-name {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            min-width: 120px;
-        }
-
         @media (min-width: 768px) {
-            .contract-name {
-                font-size: 0.95rem;
-                min-width: 150px;
+            .contract-item {
+                font-size: 0.9rem;
+                padding: 10px 0;
             }
         }
 
-        .contract-address {
+        .contract-label {
+            color: var(--text-secondary);
+            min-width: 110px;
+        }
+
+        .contract-addr {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
             color: var(--accent-blue);
             background: rgba(0, 212, 255, 0.1);
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 3px 8px;
+            border-radius: 4px;
             word-break: break-all;
-        }
-
-        @media (min-width: 768px) {
-            .contract-address {
-                font-size: 0.85rem;
-                padding: 6px 12px;
-                border-radius: 8px;
-            }
         }
 
         .impact-grid {
@@ -715,174 +632,95 @@
         @media (min-width: 768px) {
             .impact-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 30px;
+                gap: 25px;
                 margin: 30px 0;
             }
         }
 
-        .impact-card {
+        .impact-box {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 18px;
             backdrop-filter: blur(20px);
         }
 
         @media (min-width: 768px) {
-            .impact-card {
-                border-radius: 20px;
-                padding: 35px;
+            .impact-box {
+                border-radius: 16px;
+                padding: 25px;
             }
         }
 
-        .impact-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .impact-box h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
         }
 
         @media (min-width: 768px) {
-            .impact-card h3 {
-                font-size: 1.4rem;
-                margin-bottom: 20px;
-                gap: 12px;
+            .impact-box h3 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
             }
         }
 
-        .impact-card ul {
+        .impact-box ul {
             list-style: none;
         }
 
-        .impact-card li {
+        .impact-box li {
             color: var(--text-secondary);
             font-size: 0.9rem;
-            padding: 7px 0;
+            padding: 6px 0;
             display: flex;
-            align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         @media (min-width: 768px) {
-            .impact-card li {
-                font-size: 1.1rem;
-                padding: 10px 0;
-                gap: 12px;
+            .impact-box li {
+                font-size: 1rem;
+                padding: 8px 0;
+                gap: 10px;
             }
         }
 
-        .impact-card li::before {
+        .impact-box li::before {
             content: '→';
             color: var(--accent-green);
-            font-weight: bold;
             flex-shrink: 0;
-        }
-
-        .closing-card {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 25px;
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        @media (min-width: 768px) {
-            .closing-card {
-                border-radius: 24px;
-                padding: 40px;
-                margin: 40px 0;
-            }
-        }
-
-        .closing-card p {
-            font-size: 1.05rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        @media (min-width: 768px) {
-            .closing-card p {
-                font-size: 1.3rem;
-            }
-        }
-
-        .thank-you-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 50%, var(--accent-green) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .thank-you-title {
-                font-size: 5rem;
-                margin-bottom: 30px;
-            }
-        }
-
-        .author-name {
-            font-size: 1.3rem;
-            color: var(--text-primary);
-            margin-bottom: 30px;
-        }
-
-        @media (min-width: 768px) {
-            .author-name {
-                font-size: 2rem;
-                margin-bottom: 40px;
-            }
-        }
-
-        .tag {
-            display: inline-block;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            color: var(--accent-blue);
-            margin: 5px;
-        }
-
-        @media (min-width: 768px) {
-            .tag {
-                padding: 6px 16px;
-                font-size: 0.9rem;
-                margin: 8px;
-            }
+            font-weight: bold;
         }
 
         .center-text {
             text-align: center;
         }
 
-        .nav-controls {
-            position: fixed;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(15, 20, 40, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 10px 20px;
+        .tag {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 4px 10px;
             border-radius: 50px;
-            border: 1px solid var(--glass-border);
-            z-index: 1000;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            margin: 5px 3px;
+        }
+
+        .nav-bottom {
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            background: rgba(15, 20, 40, 0.8);
+            border-top: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
         }
 
         @media (min-width: 768px) {
-            .nav-controls {
-                bottom: 30px;
+            .nav-bottom {
+                padding: 20px;
                 gap: 20px;
-                padding: 15px 30px;
             }
         }
 
@@ -901,7 +739,7 @@
 
         @media (min-width: 768px) {
             .nav-btn {
-                padding: 12px 24px;
+                padding: 10px 20px;
                 font-size: 1rem;
             }
         }
@@ -911,7 +749,7 @@
             border-color: var(--accent-blue);
         }
 
-        .slide-counter {
+        .counter {
             font-size: 0.9rem;
             color: var(--text-secondary);
             padding: 0 12px;
@@ -920,31 +758,25 @@
         }
 
         @media (min-width: 768px) {
-            .slide-counter {
+            .counter {
                 font-size: 1rem;
-                padding: 0 20px;
+                padding: 0 15px;
             }
         }
 
-        .slide-counter .current {
+        .counter .curr {
             color: var(--accent-blue);
             font-weight: 600;
         }
 
-        .progress-bar {
+        .progress {
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-green));
             position: fixed;
             top: 0;
             left: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-green));
+            z-index: 1000;
             transition: width 0.3s ease;
-            z-index: 1001;
-        }
-
-        @media (min-width: 768px) {
-            .progress-bar {
-                height: 3px;
-            }
         }
     </style>
 </head>
@@ -955,310 +787,199 @@
         <div class="gradient-orb orb-3"></div>
     </div>
     <div class="grid-overlay"></div>
-    <div class="progress-bar" id="progress"></div>
+    <div class="progress" id="progress"></div>
 
-    <div class="slides-wrapper">
+    <div class="slides-container" id="slidesContainer">
         <!-- Slide 1 -->
-        <div class="slide active" data-slide="1">
-            <div class="slide-inner center-text">
-                <div style="margin-bottom: 20px;">
-                    <span class="tag">Reactive Network Bounty</span>
-                </div>
+        <div class="slide">
+            <div class="slide-content center-text">
+                <div style="margin-bottom: 20px;"><span class="tag">Reactive Network Bounty</span></div>
                 <h1 class="mega-title">MOC</h1>
                 <p class="subtitle">MIRROR OF CHAINLINK</p>
-                <p style="color: var(--text-secondary); font-size: 1rem; margin-top: 25px; line-height: 1.7;">
-                    Trustless cross-chain price feeds powered by Reactive Contracts
-                </p>
-                <p style="color: var(--text-secondary); margin-top: 40px; font-size: 0.95rem;">
-                    Built by <span class="highlight-blue">Jaden</span>
-                </p>
+                <p style="color: var(--text-secondary); font-size: 1rem; margin: 25px 0; line-height: 1.7;">Trustless cross-chain price feeds powered by Reactive Contracts</p>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">Built by <span class="highlight-blue">Jaden</span></p>
             </div>
         </div>
 
         <!-- Slide 2 -->
-        <div class="slide" data-slide="2">
-            <div class="slide-inner">
-                <h2 class="section-title"><span class="icon">🚨</span> The Problem</h2>
+        <div class="slide">
+            <div class="slide-content">
+                <h2 class="section-title">🚨 The Problem</h2>
                 <div class="glass-card problem-card">
                     <div class="card-title">Chainlink Is Not Everywhere</div>
-                    <p class="card-text">Chainlink price feeds are the industry standard. But they're <span class="highlight-red">not deployed on every chain</span>. Building on a new L2, a small testnet, or a private rollup? Your smart contracts are basically blind.</p>
+                    <p class="card-text">Chainlink price feeds are the industry standard. But they're <span class="highlight-red">not deployed on every chain</span>. Building on a new L2 or testnet? Your smart contracts are basically blind.</p>
                 </div>
                 <div class="glass-card problem-card">
                     <div class="card-title">Centralized Relayers Are Dangerous</div>
-                    <p class="card-text">The traditional workaround: some backend service reads Chainlink on Ethereum and pushes prices to your chain. That's a <span class="highlight-red">single point of failure</span>. Goes down? Prices stop. Compromised? Fake prices everywhere.</p>
+                    <p class="card-text">The traditional workaround: some backend service reads Chainlink on Ethereum and pushes prices to your chain. That's a <span class="highlight-red">single point of failure</span>. Goes down? Prices stop.</p>
                 </div>
                 <div class="glass-card problem-card">
                     <div class="card-title">Oracle Attacks Are Real</div>
-                    <p class="card-text">We've seen it happen. Price manipulation, flash crash exploits, replay attacks. One wrong oracle number = <span class="highlight-red">protocols get liquidated</span>. Without proper validation, your protocol is defenseless.</p>
+                    <p class="card-text">We've seen it happen. Price manipulation, flash crash exploits, replay attacks. One wrong oracle number = <span class="highlight-red">protocols get liquidated</span>.</p>
                 </div>
             </div>
         </div>
 
         <!-- Slide 3 -->
-        <div class="slide" data-slide="3">
-            <div class="slide-inner">
-                <h2 class="section-title"><span class="icon">✨</span> The Solution</h2>
+        <div class="slide">
+            <div class="slide-content">
+                <h2 class="section-title">✨ The Solution</h2>
                 <div class="glass-card solution-card">
                     <div class="card-title">Trustless Cross-Chain Mirroring</div>
-                    <p class="card-text">MOC takes a Chainlink feed on Sepolia and mirrors it to another chain using <span class="highlight-green">Reactive Contracts</span>. No centralized relayer. No backend. Everything validated on-chain.</p>
+                    <p class="card-text">MOC takes a Chainlink feed on Sepolia and mirrors it to another chain using <span class="highlight-green">Reactive Contracts</span>. No centralized relayer. Everything validated on-chain.</p>
                 </div>
                 <div class="glass-card solution-card">
                     <div class="card-title">Real-Time Attack Detection</div>
-                    <p class="card-text">Every price is validated before storage. Zero prices? <span class="highlight-green">Rejected</span>. Negative prices? <span class="highlight-green">Rejected</span>. Flash crashes? <span class="highlight-green">Detected</span>. Replay attacks? <span class="highlight-green">Blocked</span>.</p>
+                    <p class="card-text">Every price is validated before storage. Zero prices? <span class="highlight-green">Rejected</span>. Negative prices? <span class="highlight-green">Rejected</span>. Flash crashes? <span class="highlight-green">Detected</span>.</p>
                 </div>
                 <div class="glass-card solution-card">
                     <div class="card-title">Full AggregatorV3 Compatibility</div>
-                    <p class="card-text">The destination implements the standard Chainlink interface. <span class="highlight-green">Apps don't need to change a single line of code</span>. Everything just works out of the box.</p>
+                    <p class="card-text">The destination implements the standard Chainlink interface. <span class="highlight-green">Apps don't need to change a single line of code</span>.</p>
                 </div>
             </div>
         </div>
 
         <!-- Slide 4 -->
-        <div class="slide" data-slide="4">
-            <div class="slide-inner">
-                <h2 class="section-title center-text"><span class="icon">🏗️</span> Architecture</h2>
-                <div class="flow-container">
-                    <div class="flow-node">
-                        <div class="node-icon">📍</div>
-                        <div class="node-title" style="color: var(--accent-blue);">Sepolia</div>
-                        <div class="node-sub">Origin Chain</div>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-node">
-                        <div class="node-icon">🔄</div>
-                        <div class="node-title" style="color: var(--accent-purple);">Reactive</div>
-                        <div class="node-sub">Middleware</div>
-                    </div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-node">
-                        <div class="node-icon">🎯</div>
-                        <div class="node-title" style="color: var(--accent-green);">Lasna</div>
-                        <div class="node-sub">Destination</div>
-                    </div>
+        <div class="slide">
+            <div class="slide-content">
+                <h2 class="section-title center">🏗️ Architecture</h2>
+                <div class="flow-row">
+                    <div class="flow-box"><div class="label">📍 Sepolia</div></div>
+                    <div style="color: var(--accent-blue); font-size: 1.5rem;">→</div>
+                    <div class="flow-box"><div class="label">🔄 Reactive</div></div>
+                    <div style="color: var(--accent-blue); font-size: 1.5rem;">→</div>
+                    <div class="flow-box"><div class="label">🎯 Lasna</div></div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 30px; text-align: center;">
-                    <div>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">
-                            ✓ Read Feed<br/>✓ Emit Event<br/>✓ Sign Data
-                        </p>
-                    </div>
-                    <div>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">
-                            ✓ Listen<br/>✓ Relay<br/>✓ Forward
-                        </p>
-                    </div>
-                    <div>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">
-                            ✓ Validate<br/>✓ Block Attacks<br/>✓ Store Prices
-                        </p>
-                    </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 25px; text-align: center;">
+                    <div><p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">✓ Read Feed<br/>✓ Emit Event</p></div>
+                    <div><p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">✓ Listen<br/>✓ Relay</p></div>
+                    <div><p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">✓ Validate<br/>✓ Store</p></div>
                 </div>
             </div>
         </div>
 
         <!-- Slide 5 -->
-        <div class="slide" data-slide="5">
-            <div class="slide-inner">
-                <h2 class="section-title center-text"><span class="icon">🛡️</span> Multi-Layer Validation</h2>
+        <div class="slide">
+            <div class="slide-content">
+                <h2 class="section-title center">🛡️ Multi-Layer Validation</h2>
                 <div class="feature-grid">
-                    <div class="feature-box">
-                        <div class="feature-icon">⏰</div>
-                        <div class="feature-title">Staleness Check</div>
-                        <div class="feature-desc">Prices older than 1 hour are rejected</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">🔢</div>
-                        <div class="feature-title">Zero Check</div>
-                        <div class="feature-desc">$0 prices instantly rejected</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">📊</div>
-                        <div class="feature-title">Deviation Limit</div>
-                        <div class="feature-desc">Can't move &gt;10% per round</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">🔐</div>
-                        <div class="feature-title">Round Sequence</div>
-                        <div class="feature-desc">IDs must increase sequentially</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">🎯</div>
-                        <div class="feature-title">Decimal Match</div>
-                        <div class="feature-desc">Must match feed config</div>
-                    </div>
-                    <div class="feature-box">
-                        <div class="feature-icon">⚔️</div>
-                        <div class="feature-title">Authorization</div>
-                        <div class="feature-desc">Approved relayers only</div>
-                    </div>
+                    <div class="feature-box"><div class="feature-icon">⏰</div><div class="feature-title">Staleness</div><div class="feature-desc">Reject old prices</div></div>
+                    <div class="feature-box"><div class="feature-icon">🔢</div><div class="feature-title">Zero Check</div><div class="feature-desc">No $0 prices</div></div>
+                    <div class="feature-box"><div class="feature-icon">📊</div><div class="feature-title">Deviation</div><div class="feature-desc">Max 10% move</div></div>
+                    <div class="feature-box"><div class="feature-icon">🔐</div><div class="feature-title">Round ID</div><div class="feature-desc">Sequential only</div></div>
+                    <div class="feature-box"><div class="feature-icon">🎯</div><div class="feature-title">Decimals</div><div class="feature-desc">Match config</div></div>
+                    <div class="feature-box"><div class="feature-icon">⚔️</div><div class="feature-title">Auth</div><div class="feature-desc">Approved only</div></div>
                 </div>
             </div>
         </div>
 
         <!-- Slide 6 -->
-        <div class="slide" data-slide="6">
-            <div class="slide-inner">
-                <h2 class="section-title center-text"><span class="icon">🦹</span> Attack Scenarios</h2>
+        <div class="slide">
+            <div class="slide-content">
+                <h2 class="section-title center">🦹 Attack Scenarios</h2>
                 <div class="attack-grid">
-                    <div class="attack-card">
-                        <div class="attack-num">01</div>
-                        <div class="attack-title">Zero-Price Injection</div>
-                        <div class="attack-desc">Attacker sends $0 to crash collateral</div>
-                        <div class="attack-result">✓ BLOCKED</div>
-                    </div>
-                    <div class="attack-card">
-                        <div class="attack-num">02</div>
-                        <div class="attack-title">Negative Price</div>
-                        <div class="attack-desc">Someone sends negative number</div>
-                        <div class="attack-result">✓ BLOCKED</div>
-                    </div>
-                    <div class="attack-card">
-                        <div class="attack-num">03</div>
-                        <div class="attack-title">Flash Crash</div>
-                        <div class="attack-desc">Price drops 99% in one update</div>
-                        <div class="attack-result">✓ BLOCKED</div>
-                    </div>
-                    <div class="attack-card">
-                        <div class="attack-num">04</div>
-                        <div class="attack-title">Replay Attack</div>
-                        <div class="attack-desc">Old price data re-submitted</div>
-                        <div class="attack-result">✓ BLOCKED</div>
-                    </div>
+                    <div class="attack-box"><div class="attack-num">01</div><div class="attack-title">Zero-Price Injection</div><div class="attack-desc">Attacker sends $0</div><div class="blocked-badge">✓ BLOCKED</div></div>
+                    <div class="attack-box"><div class="attack-num">02</div><div class="attack-title">Negative Price</div><div class="attack-desc">Negative number</div><div class="blocked-badge">✓ BLOCKED</div></div>
+                    <div class="attack-box"><div class="attack-num">03</div><div class="attack-title">Flash Crash</div><div class="attack-desc">99% drop</div><div class="blocked-badge">✓ BLOCKED</div></div>
+                    <div class="attack-box"><div class="attack-num">04</div><div class="attack-title">Replay Attack</div><div class="attack-desc">Old data re-used</div><div class="blocked-badge">✓ BLOCKED</div></div>
                 </div>
-                <div class="stats-row">
-                    <div class="stat-box">
-                        <div class="stat-number">4/4</div>
-                        <div class="stat-label">Attacks Blocked</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">Threat Detection</div>
-                    </div>
+                <div class="stats">
+                    <div class="stat"><div class="stat-num">4/4</div><div class="stat-label">Blocked</div></div>
+                    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Detection</div></div>
                 </div>
             </div>
         </div>
 
         <!-- Slide 7 -->
-        <div class="slide" data-slide="7">
-            <div class="slide-inner">
-                <h2 class="section-title center-text"><span class="icon">✅</span> Live on Testnet</h2>
+        <div class="slide">
+            <div class="slide-content">
+                <h2 class="section-title center">✅ Live on Testnet</h2>
                 <div class="contract-grid">
-                    <div class="contract-card sepolia">
-                        <div class="chain-name">
-                            <span style="color: var(--accent-blue);">📍 Sepolia</span>
-                            <span class="chain-badge">11155111</span>
-                        </div>
-                        <div class="contract-item">
-                            <span class="contract-name">MockPriceFeed</span>
-                            <span class="contract-address">0xE293...250c</span>
-                        </div>
-                        <div class="contract-item">
-                            <span class="contract-name">OriginFeedRelay</span>
-                            <span class="contract-address">0x46ad...7A57</span>
-                        </div>
+                    <div class="contract-box sep">
+                        <div class="contract-chain" style="color: var(--accent-blue);">📍 Sepolia</div>
+                        <div class="contract-item"><span class="contract-label">MockPriceFeed</span><span class="contract-addr">0xE293...250c</span></div>
+                        <div class="contract-item"><span class="contract-label">OriginFeedRelay</span><span class="contract-addr">0x46ad...7A57</span></div>
                     </div>
-                    <div class="contract-card lasna">
-                        <div class="chain-name">
-                            <span style="color: var(--accent-purple);">🎯 Lasna</span>
-                            <span class="chain-badge" style="background: rgba(168, 85, 247, 0.2); color: var(--accent-purple);">5318007</span>
-                        </div>
-                        <div class="contract-item">
-                            <span class="contract-name">DestinationFeedProxy</span>
-                            <span class="contract-address" style="color: var(--accent-purple); background: rgba(168, 85, 247, 0.1);">0x46ad...7A57</span>
-                        </div>
-                        <div class="contract-item">
-                            <span class="contract-name">PriceFeedReactor</span>
-                            <span class="contract-address" style="color: var(--accent-purple); background: rgba(168, 85, 247, 0.1);">0xE293...250c</span>
-                        </div>
+                    <div class="contract-box las">
+                        <div class="contract-chain" style="color: var(--accent-purple);">🎯 Lasna</div>
+                        <div class="contract-item"><span class="contract-label">DestinationFeedProxy</span><span class="contract-addr" style="color: var(--accent-purple); background: rgba(168, 85, 247, 0.1);">0x46ad...7A57</span></div>
+                        <div class="contract-item"><span class="contract-label">PriceFeedReactor</span><span class="contract-addr" style="color: var(--accent-purple); background: rgba(168, 85, 247, 0.1);">0xE293...250c</span></div>
                     </div>
                 </div>
-                <p style="color: var(--text-secondary); text-align: center; margin-top: 25px; font-size: 0.9rem;">
-                    All contracts publicly auditable. Everything on-chain.
-                </p>
+                <p style="color: var(--text-secondary); text-align: center; margin-top: 20px; font-size: 0.9rem;">All contracts publicly auditable. Everything on-chain.</p>
             </div>
         </div>
 
         <!-- Slide 8 -->
-        <div class="slide" data-slide="8">
-            <div class="slide-inner">
-                <h2 class="section-title center-text"><span class="icon">🚀</span> What This Unlocks</h2>
+        <div class="slide">
+            <div class="slide-content">
+                <h2 class="section-title center">🚀 What This Unlocks</h2>
                 <div class="impact-grid">
-                    <div class="impact-card">
-                        <h3><span style="color: var(--accent-blue);">👩‍💻</span> For Developers</h3>
+                    <div class="impact-box">
+                        <h3 style="color: var(--accent-blue);">👩‍💻 For Developers</h3>
                         <ul>
-                            <li>Any chain can use Chainlink prices</li>
+                            <li>Any chain can use Chainlink</li>
                             <li>No code changes needed</li>
-                            <li>Standard AggregatorV3 interface</li>
-                            <li>Production-ready infra</li>
+                            <li>Standard interface</li>
+                            <li>Production-ready</li>
                         </ul>
                     </div>
-                    <div class="impact-card">
-                        <h3><span style="color: var(--accent-purple);">🏦</span> For Protocols</h3>
+                    <div class="impact-box">
+                        <h3 style="color: var(--accent-purple);">🏦 For Protocols</h3>
                         <ul>
-                            <li>Zero oracle manipulation risk</li>
-                            <li>Multi-layer attack detection</li>
+                            <li>Zero manipulation risk</li>
+                            <li>Multi-layer detection</li>
                             <li>Trustless validation</li>
                             <li>Decentralized relay</li>
                         </ul>
                     </div>
                 </div>
-                <div class="closing-card">
-                    <p>MOC is <span class="highlight-green">fully deployed</span>, <span class="highlight-blue">fully verifiable</span>, and <span class="highlight-purple">end-to-end secure</span>.</p>
+                <div style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; text-align: center; margin-top: 20px;">
+                    <p style="color: var(--text-secondary);">MOC is <span class="highlight-green">fully deployed</span>, <span class="highlight-blue">fully verifiable</span>, and <span class="highlight-purple">end-to-end secure</span>.</p>
                 </div>
             </div>
         </div>
 
         <!-- Slide 9 -->
-        <div class="slide" data-slide="9">
-            <div class="slide-inner center-text">
-                <h1 class="thank-you-title">Thanks!</h1>
-                <p class="author-name">Built by Jaden</p>
-                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 20px 0;">
+        <div class="slide">
+            <div class="slide-content center-text">
+                <h1 class="mega-title">Thanks!</h1>
+                <p class="author-name" style="margin: 20px 0;">Built by Jaden</p>
+                <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 20px 0;">
                     <span class="tag">Reactive Contracts</span>
                     <span class="tag">Sepolia ↔️ Lasna</span>
-                    <span class="tag">100% Attack Detection</span>
+                    <span class="tag">100% Detection</span>
                 </div>
-                <div class="closing-card" style="max-width: 500px;">
-                    <p style="font-size: 1rem;">MOC: Mirror of Chainlink<br/><span style="color: var(--text-secondary);">Reactive Network Bounty</span></p>
+                <div style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; text-align: center;">
+                    <p style="color: var(--text-secondary);">MOC: Mirror of Chainlink<br/><span style="font-size: 0.9rem;">Reactive Network Bounty</span></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="nav-controls">
+    <div class="nav-bottom">
         <button class="nav-btn" onclick="prevSlide()">← Prev</button>
-        <span class="slide-counter"><span class="current" id="currentSlide">1</span> / 9</span>
+        <span class="counter"><span class="curr" id="curr">1</span> / 9</span>
         <button class="nav-btn" onclick="nextSlide()">Next →</button>
     </div>
 
     <script>
-        let currentSlide = 1;
-        let touchStartX = 0;
-        let touchEndX = 0;
+        let current = 1;
+        const container = document.getElementById('slidesContainer');
 
-        function updateSlide() {
-            document.querySelectorAll('.slide').forEach((slide, index) => {
-                slide.classList.remove('active');
-                if (index + 1 === currentSlide) {
-                    slide.classList.add('active');
-                }
-            });
-            document.getElementById('currentSlide').textContent = currentSlide;
-            document.getElementById('progress').style.width = (currentSlide / 9 * 100) + '%';
+        function updateProgress() {
+            document.getElementById('progress').style.width = (current / 9 * 100) + '%';
+            document.getElementById('curr').textContent = current;
         }
 
         function nextSlide() {
-            if (currentSlide < 9) {
-                currentSlide++;
-                updateSlide();
-            }
+            if (current < 9) current++;
+            updateProgress();
         }
 
         function prevSlide() {
-            if (currentSlide > 1) {
-                currentSlide--;
-                updateSlide();
-            }
+            if (current > 1) current--;
+            updateProgress();
         }
 
         document.addEventListener('keydown', (e) => {
@@ -1266,21 +987,7 @@
             if (e.key === 'ArrowLeft') prevSlide();
         });
 
-        document.querySelector('.slides-wrapper').addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, false);
-
-        document.querySelector('.slides-wrapper').addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, false);
-
-        function handleSwipe() {
-            if (touchEndX < touchStartX - 50) nextSlide();
-            if (touchEndX > touchStartX + 50) prevSlide();
-        }
-
-        updateSlide();
+        updateProgress();
     </script>
 </body>
 </html>
