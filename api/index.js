@@ -10,7 +10,15 @@ app.use(cors());
 app.use(express.json());
 
 const distPath = path.join(__dirname, '..', 'dist');
+const presentationPath = path.join(__dirname, '..', 'presentation');
+
 app.use(express.static(distPath));
+app.use('/presentation', express.static(presentationPath));
+
+// Serve slides directly
+app.get('/slides', (req, res) => {
+  res.sendFile(path.join(presentationPath, 'slides.html'));
+});
 
 // List of allowed commands for security
 const ALLOWED_COMMANDS = [
