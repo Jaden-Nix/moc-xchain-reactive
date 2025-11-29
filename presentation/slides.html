@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOC - Mirror of Chainlink</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+        }
+
+        .slide-container {
+            max-width: 1200px;
+            width: 100%;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+        }
+
+        .glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 30px;
+        }
+
+        .problem-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .problem-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(30, 41, 59, 0.95);
+            transform: translateX(10px);
+        }
+
+        .problem-card h3 {
+            color: #ef4444;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .problem-card p {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .solution-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .solution-card:hover {
+            border-color: rgba(34, 197, 94, 0.5);
+            background: rgba(30, 41, 59, 0.95);
+            transform: translateX(10px);
+        }
+
+        .solution-card h3 {
+            color: #22c55e;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .solution-card p {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .flow-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            color: #e0e7ff;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 15px 0;
+        }
+
+        .arrow {
+            font-size: 2rem;
+            color: #3b82f6;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .attack-item {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 15px 20px;
+            margin: 12px 0;
+            border-radius: 6px;
+            animation: slideIn 0.6s ease-out forwards;
+        }
+
+        .attack-item:nth-child(1) { animation-delay: 0.1s; }
+        .attack-item:nth-child(2) { animation-delay: 0.2s; }
+        .attack-item:nth-child(3) { animation-delay: 0.3s; }
+        .attack-item:nth-child(4) { animation-delay: 0.4s; }
+
+        .attack-item h4 {
+            color: #fca5a5;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .attack-item p {
+            color: #fecaca;
+            font-size: 0.95rem;
+        }
+
+        .stat-box {
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid rgba(34, 197, 94, 0.4);
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            display: inline-block;
+            min-width: 250px;
+            margin: 15px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-box:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.6);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            color: #e0e7ff;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: #3b82f6;
+            font-weight: 700;
+        }
+
+        .warning-text {
+            color: #fca5a5;
+            font-weight: 600;
+        }
+
+        .success-text {
+            color: #86efac;
+            font-weight: 600;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 999;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #f1f5f9;
+        }
+
+        .btn-prev, .btn-next {
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-prev:hover, .btn-next:hover {
+            background: rgba(59, 130, 246, 0.6);
+            border-color: rgba(59, 130, 246, 0.8);
+        }
+
+        .slide-counter {
+            padding: 10px 15px;
+            color: #cbd5e1;
+            font-weight: 600;
+            border-left: 1px solid rgba(59, 130, 246, 0.3);
+            border-right: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            margin-top: 30px;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #64748b;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1: Title -->
+    <div class="slide">
+        <div class="slide-container">
+            <div style="text-align: center;">
+                <h1 class="mb-4">⚙️ MOC</h1>
+                <h2 style="font-size: 3rem; background: linear-gradient(135deg, #3b82f6 0%, #22c55e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Mirror of Chainlink</h2>
+                <p style="color: #94a3b8; font-size: 1.3rem; margin-top: 30px;">Trustless Cross-Chain Price Feeds Using Reactive Contracts</p>
+                <p style="color: #64748b; font-size: 1rem; margin-top: 40px; font-weight: 500;">Built by Jaden • Reactive Network Bounty Submission</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: The Problem -->
+    <div class="slide">
+        <div class="slide-container">
+            <h2 style="text-align: center; margin-bottom: 50px;">🚨 The Problem</h2>
+            
+            <div class="problem-card">
+                <h3>❌ Chainlink Is Not Everywhere</h3>
+                <p>Chainlink price feeds are the industry standard. But they're not deployed on every chain. If you're building on a new L2, a small testnet, or a private rollup... you basically have <span class="warning-text">no access to Chainlink prices</span>.</p>
+            </div>
+
+            <div class="problem-card">
+                <h3>❌ Centralized Relayers Are a Liability</h3>
+                <p>The workaround? Run a backend service that reads Chainlink and pushes prices to your chain. But that's a <span class="warning-text">single point of failure</span>. If it goes down, prices stop. If it's compromised, fake prices get injected. One wrong number = protocols get liquidated.</p>
+            </div>
+
+            <div class="problem-card">
+                <h3>❌ Oracle Attacks Are Real</h3>
+                <p>We've seen it happen: price manipulations, flash crash exploits, replay attacks. Without proper validation on the destination, your protocol is <span class="warning-text">defenseless</span>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: The Solution -->
+    <div class="slide">
+        <div class="slide-container">
+            <h2 style="text-align: center; margin-bottom: 50px;">✅ The Solution: MOC</h2>
+            
+            <div class="solution-card">
+                <h3>🔗 Trustless Cross-Chain Mirroring</h3>
+                <p>MOC takes a Chainlink feed on Sepolia and mirrors it to another chain using <span class="highlight">Reactive Contracts</span>. No centralized relayer. No backend. Everything validated on-chain.</p>
+            </div>
+
+            <div class="solution-card">
+                <h3>🛡️ Real-Time Validation</h3>
+                <p>Every price is validated before it's stored. Zero prices? Rejected. Negative prices? Rejected. Flash crashes? Detected. Replay attacks? Blocked. <span class="success-text">Only clean data makes it through</span>.</p>
+            </div>
+
+            <div class="solution-card">
+                <h3>📡 Full AggregatorV3 Compatibility</h3>
+                <p>The destination implements the standard Chainlink interface. Apps don't need to change a single line of code. Everything just works out of the box.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Architecture -->
+    <div class="slide">
+        <div class="slide-container">
+            <h2 style="text-align: center; margin-bottom: 50px;">🏗️ How It Works</h2>
+            
+            <div class="flow-box">📍 Sepolia (Origin Chain)</div>
+            <div style="text-align: center; color: #94a3b8; margin: 15px 0;">
+                <p style="margin-bottom: 10px;">✓ Read Chainlink feed using AggregatorV3Interface</p>
+                <p>✓ Emit signed message with full metadata</p>
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <div class="flow-box">🔄 Reactive Network (Middleware)</div>
+            <div style="text-align: center; color: #94a3b8; margin: 15px 0;">
+                <p>✓ Listen for on-chain events</p>
+                <p>✓ Automatically relay cross-chain</p>
+            </div>
+            
+            <div class="arrow">⬇️</div>
+            
+            <div class="flow-box">🎯 Lasna (Destination Chain)</div>
+            <div style="text-align: center; color: #94a3b8; margin: 15px 0;">
+                <p style="margin-bottom: 10px;">✓ Validate all data before storage</p>
+                <p>✓ Expose standard AggregatorV3 interface</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <p style="color: #cbd5e1; font-size: 1.1rem;">Result: <span class="success-text">Full Chainlink compatibility on any chain</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: What Gets Validated -->
+    <div class="slide">
+        <div class="slide-container">
+            <h2 style="text-align: center; margin-bottom: 50px;">🔍 Multi-Layer Validation</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-box">
+                    <div class="feature-icon">⏰</div>
+                    <div class="feature-title">Timestamp Fresh?</div>
+                    <div class="feature-desc">Prices older than 1 hour are rejected to prevent stale data attacks</div>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-icon">🔢</div>
+                    <div class="feature-title">Non-Zero Price?</div>
+                    <div class="feature-desc">$0 prices are instantly rejected to prevent liquidation cascades</div>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-icon">📈</div>
+                    <div class="feature-title">Reasonable Deviation?</div>
+                    <div class="feature-desc">Prices can't move more than 10% per round to catch flash crashes</div>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-icon">🔐</div>
+                    <div class="feature-title">Valid Round ID?</div>
+                    <div class="feature-desc">Round IDs must increase sequentially to prevent replay attacks</div>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-title">Correct Decimals?</div>
+                    <div class="feature-desc">Must match the feed config to prevent data corruption</div>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-icon">⚔️</div>
+                    <div class="feature-title">Authorized Relayer?</div>
+                    <div class="feature-desc">Only approved relayers can submit price updates</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Attack Simulation -->
+    <div class="slide">
+        <div class="slide-container">
+            <h2 style="text-align: center; margin-bottom: 50px;">🦹 Real Attack Scenarios</h2>
+            
+            <p style="color: #cbd5e1; text-align: center; margin-bottom: 40px; font-size: 1.1rem;">I ran 4 real attacks against the smart contract. Here's what happened:</p>
+
+            <div class="attack-item">
+                <h4>1. Zero-Price Injection Attack</h4>
+                <p>Attacker tries to send $0 to crash collateral value → <span class="success-text">REJECTED (InvalidAnswer)</span></p>
+            </div>
+
+            <div class="attack-item">
+                <h4>2. Negative Price Attack</h4>
+                <p>Someone sends a negative number to confuse the system → <span class="success-text">REJECTED (InvalidAnswer)</span></p>
+            </div>
+
+            <div class="attack-item">
+                <h4>3. Flash Crash Manipulation</h4>
+                <p>Price drops from $1500 to $15 (99% crash) → <span class="success-text">REJECTED (DeviationTooHigh)</span></p>
+            </div>
+
+            <div class="attack-item">
+                <h4>4. Replay Attack</h4>
+                <p>Old price data from 10 minutes ago re-submitted → <span class="success-text">REJECTED (InvalidRoundId)</span></p>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <div class="stat-box">
+                    <div class="stat-number">4/4</div>
+                    <div class="stat-label">Attacks Blocked</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Threat Detection</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Deployed & Verified -->
+    <div class="slide">
+        <div class="slide-container">
+            <h2 style="text-align: center; margin-bottom: 50px;">✅ Live on Testnet</h2>
+            
+            <div style="background: rgba(34, 197, 94, 0.1); border: 2px solid rgba(34, 197, 94, 0.4); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
+                <h3 style="color: #22c55e; margin-bottom: 15px;">Sepolia (Origin Chain)</h3>
+                <p style="color: #cbd5e1; margin-bottom: 10px;">MockPriceFeed: <span style="font-family: monospace; color: #93c5fd;">0xE293955c98D37044400E71c445062d7cd967250c</span></p>
+                <p style="color: #cbd5e1; margin-bottom: 10px;">OriginFeedRelay: <span style="font-family: monospace; color: #93c5fd;">0x46ad513300d508FB234fefD3ec1aB4162C547A57</span></p>
+                <p style="color: #cbd5e1;">Status: <span class="success-text">✅ Live & Verified</span></p>
+            </div>
+
+            <div style="background: rgba(168, 85, 247, 0.1); border: 2px solid rgba(168, 85, 247, 0.4); border-radius: 12px; padding: 30px;">
+                <h3 style="color: #d8b4fe; margin-bottom: 15px;">Lasna (Destination Chain)</h3>
+                <p style="color: #cbd5e1; margin-bottom: 10px;">DestinationFeedProxy: <span style="font-family: monospace; color: #d8b4fe;">0x46ad513300d508FB234fefD3ec1aB4162C547A57</span></p>
+                <p style="color: #cbd5e1; margin-bottom: 10px;">PriceFeedReactor: <span style="font-family: monospace; color: #d8b4fe;">0xE293955c98D37044400E71c445062d7cd967250c</span></p>
+                <p style="color: #cbd5e1;">Status: <span class="success-text">✅ Live & Subscribed</span></p>
+            </div>
+
+            <p style="color: #64748b; text-align: center; margin-top: 40px; font-size: 0.95rem;">All contracts are publicly auditable. Check Etherscan and the Reactive Network explorer for full event logs.</p>
+        </div>
+    </div>
+
+    <!-- Slide 8: Impact & Conclusion -->
+    <div class="slide">
+        <div class="slide-container">
+            <h2 style="text-align: center; margin-bottom: 50px;">🚀 What This Unlocks</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 25px;">
+                    <h3 style="color: #93c5fd; margin-bottom: 15px;">For Developers</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">✓ Any chain can use Chainlink prices<br/>✓ No code changes needed (standard interface)<br/>✓ Full security guarantees<br/>✓ Production-ready infrastructure</p>
+                </div>
+
+                <div style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 10px; padding: 25px;">
+                    <h3 style="color: #d8b4fe; margin-bottom: 15px;">For Protocols</h3>
+                    <p style="color: #cbd5e1; line-height: 1.8;">✓ Zero oracle manipulation risk<br/>✓ Multi-layer attack detection<br/>✓ Trustless validation<br/>✓ Decentralized relay infrastructure</p>
+                </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 30px; text-align: center;">
+                <p style="color: #cbd5e1; font-size: 1.2rem; margin-bottom: 20px;">MOC is fully deployed, fully verifiable, and end-to-end secure.</p>
+                <p style="color: #94a3b8;">Built on Reactive Contracts with full validation on the destination chain.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Thank You -->
+    <div class="slide">
+        <div class="slide-container">
+            <div style="text-align: center;">
+                <h1 style="font-size: 3.5rem; margin-bottom: 30px;">Thanks! 🙏</h1>
+                <h2 style="font-size: 2rem; background: linear-gradient(135deg, #3b82f6 0%, #22c55e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 40px;">Built by Jaden</h2>
+                
+                <div style="margin: 40px 0;">
+                    <p style="color: #cbd5e1; font-size: 1.1rem; margin-bottom: 15px;">MOC: Mirror of Chainlink</p>
+                    <p style="color: #64748b; margin-bottom: 30px;">Reactive Network Bounty Submission</p>
+                </div>
+
+                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 20px; display: inline-block;">
+                    <p style="color: #cbd5e1; margin-bottom: 5px;">Deployed:</p>
+                    <p style="color: #93c5fd; font-weight: 600;">Sepolia ↔️ Reactive Network ↔️ Lasna</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn-prev" onclick="prevSlide()">← Prev</button>
+        <span class="slide-counter"><span id="current">1</span> / <span id="total">9</span></span>
+        <button class="btn-next" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = document.querySelectorAll('.slide').length;
+        document.getElementById('total').textContent = totalSlides;
+
+        function updateSlide() {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                slide.style.display = index + 1 === currentSlide ? 'flex' : 'none';
+            });
+            document.getElementById('current').textContent = currentSlide;
+            window.scrollTo(0, 0);
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+I need a quick well detailed slide for my app. here’s the proposed script build it use html css and tailwind and stuff just make it look really awesome 
+
+Hey, what’s up everyone, I’m Jaden, and today I’m showing you something I built called MOC — Mirror of Chainlink.
+Before I show anything, here’s the problem it solves…”
+
+
+“Chainlink price feeds are the standard, right? Everyone uses them.
+But the issue is: they’re not deployed everywhere.
+
+If you’re building on a new L2, a small testnet, or a private chain…
+you basically have no access to Chainlink prices.
+
+So your smart contracts are basically blind no ETH price, no BTC price, nothing.
+And without that, you can’t do DeFi. You can’t do lending. You can’t build anything price-dependent.”
+
+
+
+“The traditional workaround is to use some centralized backend that reads Chainlink on Ethereum, and then pushes the price to your chain.
+
+But that’s literally a single point of failure.
+
+If that relayer goes down, prices stop updating.
+If it gets compromised, it can send fake prices.
+And with oracles, one wrong number = protocols get liquidated.
+
+We’ve seen oracle manipulation before — it’s real. so here’s what I built to fix that.
+
+MOC — Mirror of Chainlink.
+
+It takes a Chainlink feed on Sepolia, and mirrors it trustlessly to another chain using Reactive Contracts.
+
+The flow looks like:
+Sepolia → Reactive Network → Lasna.
+
+No centralized relayer.
+No backend.
+Everything validated on-chain.”
+
+⸻
+
+
+“Here’s how the system behaves:
+	•	On Sepolia, I read the Chainlink feed using the standard AggregatorV3 interface.
+	•	I emit an event with the full metadata: round, price, timestamp, version — everything.
+	•	Reactive Network listens for that event and automatically forwards it cross-chain.
+	•	On Lasna, my smart contract validates the data before accepting it.
+
+If the data is sketchy, stale, or manipulated it gets rejected. Only clean prices pass.”
+
+(screen record start here)
+
+“All the contracts are deployed publicly.
+Origin on Sepolia, Reactor in the middle, Destination on Lasna.
+
+You can literally check everything on-chain — addresses, TX hashes, event logs.
+This is all live testnet infrastructure, not a mock demo.”
+
+⸻
+
+“Let me show you the workflow.
+
+Right now the Sepolia price is: 2500 dollars — round ID 27 and time stamp
+This is coming straight from the mock Chainlink feed.”
+
+“I’m going to simulate a new price.
+
+
+Confirming that transaction…
+Boom — new round created on Sepolia. go up and click read latest price to confirm the new round and new id 
+
+
+“Reactive Network picks up that event automatically.
+
+But I’m going to manually trigger the relay just to show the step.
+In production, the Reactor would fire instantly — I just separated it for the demo.”
+you can see the price has been relayed to sepolia then i’ll send to lasna by clicking send to destination 
+
+
+
+“So that’s two transactions:
+One to read the data from Sepolia,
+and another to write the validated result to Lasna.
+
+Behind the scenes, the destination contract is checking everything:
+	•	Is the timestamp fresh?
+	•	Is the price non-zero?
+	•	Did the round increase?
+	•	Did the price spike or crash too much?
+	•	Are decimals the same?
+
+If all good, it stores the value.”
+
+go click the read destination price And here it is — same price, same round ID. time stamp
+Lasna now has the Sepolia Chainlink price feed mirrored 1:1.”
+
+“Now I’ll show why this matters.
+
+I built 4 real oracle attack tests — actual things that happen on-chain in the wild.”
+	1.	Zero price attack
+“Attacker tries to force a $0 price to liquidate everyone. Rejected.”
+	2.	Negative price attack
+“Price < 0? Rejected instantly.”
+	3.	Flash-crash manipulation
+“Price drops 99% in one update. This triggers the deviation check. Blocked.”
+	4.	Replay attack
+“Reusing old data from an old round. Also blocked.”
+
+“Four attacks. Zero success.
+The contract catches everything before anything is stored.”
+
+“So what does this unlock?
+
+MOC lets any chain — any L2, any testnet, any private rollup — use Chainlink price feeds even if Chainlink isn’t deployed there.
+
+And because the destination implements the standard AggregatorV3 interface, apps don’t need to change a single line of code. Everything just works.”
+
+⸻
+
+
+
+
+“So yeah — that’s MOC.
+
+Fully deployed, fully verifiable, end-to-end secure.
+Built on Reactive Contracts, with full validation on the destination chain, and 100% attack detection.
+
+Thanks for watching, and thanks to the Reactive Network team for the opportunity.”
