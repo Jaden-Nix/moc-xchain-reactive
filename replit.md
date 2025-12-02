@@ -149,3 +149,13 @@ npm run compile      # Compile contracts
 
 **Status: READY FOR SUBMISSION**
 Last Updated: December 2025
+
+---
+
+## Recent Fixes
+
+### BigInt Serialization Fix (December 2025)
+- Fixed "Cannot convert a BigInt value to a number" error in backend API
+- Properly converting all BigInt values before JSON serialization
+- Updated RPC endpoints to avoid rate-limited providers
+- All price feeds now loading correctly from real Chainlink oracles
