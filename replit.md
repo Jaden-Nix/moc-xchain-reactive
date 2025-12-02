@@ -44,22 +44,28 @@
 ## Deployment Summary (PRODUCTION)
 
 ### Sepolia (Origin Chain - 11155111)
-- **OriginFeedRelay (Real Chainlink)**: `0xee481f6Fad0209880D61a072Ee7307CDC74dCDf8`
-- **Connected to ETH/USD**: `0x694AA1769357215DE4FAC081bf1f309aDC325306`
 
-### Real Chainlink Feeds (Sepolia)
-- **ETH/USD**: 0x694AA1769357215DE4FAC081bf1f309aDC325306
-- **BTC/USD**: 0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43
-- **LINK/USD**: 0xc59E3633BAAC79493d908e63626716e204A45EdF
+| Feed | OriginFeedRelay | Chainlink Feed |
+|------|-----------------|----------------|
+| ETH/USD | `0xee481f6Fad0209880D61a072Ee7307CDC74dCDf8` | `0x694AA1769357215DE4FAC081bf1f309aDC325306` |
+| BTC/USD | `0x12B74592d6077C1E52a814118169b1A7B78DC4F2` | `0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43` |
+| LINK/USD | `0x760FBf81b2FE506dEc35dA1385E65C79A8fD12FB` | `0xc59E3633BAAC79493d908e63626716e204A45EdF` |
 
 ### Lasna (Reactive Network - 5318007)
-- **PriceFeedReactor**: `0x7d6a70f8303385D182ABAd16a8159B6A27FE6B25`
-- **DestinationFeedProxy**: `0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581`
+
+| Feed | PriceFeedReactor | DestinationFeedProxy |
+|------|------------------|----------------------|
+| ETH/USD | `0x7d6a70f8303385D182ABAd16a8159B6A27FE6B25` | `0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581` |
+| BTC/USD | `0xe8B05809c380e7E52bd68b113A737241678c202C` | `0x3C828678De4F4184952D66f2d0260B5db2e0f522` |
+| LINK/USD | `0x7a0D8E6FDd1760C61a9f422036Db098E4D3ae659` | `0x3E6114bdd39db5c624C67FbCEDe7B3053E621915` |
 
 ### Block Explorers
-- Sepolia OriginFeedRelay: https://sepolia.etherscan.io/address/0xee481f6Fad0209880D61a072Ee7307CDC74dCDf8
-- Lasna PriceFeedReactor: https://lasna-scan.rkt.ink/address/0x7d6a70f8303385D182ABAd16a8159B6A27FE6B25
-- Lasna DestinationFeedProxy: https://lasna-scan.rkt.ink/address/0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581
+- [ETH Sepolia Relay](https://sepolia.etherscan.io/address/0xee481f6Fad0209880D61a072Ee7307CDC74dCDf8)
+- [BTC Sepolia Relay](https://sepolia.etherscan.io/address/0x12B74592d6077C1E52a814118169b1A7B78DC4F2)
+- [LINK Sepolia Relay](https://sepolia.etherscan.io/address/0x760FBf81b2FE506dEc35dA1385E65C79A8fD12FB)
+- [ETH Lasna Destination](https://lasna-scan.rkt.ink/address/0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581)
+- [BTC Lasna Destination](https://lasna-scan.rkt.ink/address/0x3C828678De4F4184952D66f2d0260B5db2e0f522)
+- [LINK Lasna Destination](https://lasna-scan.rkt.ink/address/0x3E6114bdd39db5c624C67FbCEDe7B3053E621915)
 
 ---
 
@@ -165,9 +171,11 @@ Last Updated: December 2025
 - Updated RPC endpoints to avoid rate-limited providers
 - All price feeds now loading correctly from real Chainlink oracles
 
-### Production Relay System (December 2025)
-- Deployed OriginFeedRelay connected to real Chainlink ETH/USD feed
-- Smart skip logic: Only relays when Chainlink has new data
-- Gas-optimized: First relay ~261k gas, subsequent skips ~47k gas
-- 24/7 automated relay worker running every 70 seconds
-- Live price data: ETH/USD at ~$2,992 from real Chainlink oracle
+### Multi-Feed Relay System (December 2025)
+- **3 Feeds**: ETH/USD, BTC/USD, LINK/USD - all from real Chainlink oracles
+- **Full Cross-Chain**: Sepolia → Lasna via Reactive Network
+- **Smart Skip Logic**: Only relays when Chainlink has new data
+- **Gas Optimized**: First relay ~261k gas, subsequent skips ~47k gas
+- **24/7 Automated**: Multi-feed relay worker running every 90 seconds
+- **Live Dashboard**: Shows both Sepolia source and Lasna destination data
+- **LasnaLiveDisplay**: Real-time destination feed status with roundId, timestamp, price
