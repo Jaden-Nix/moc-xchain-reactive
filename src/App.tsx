@@ -22,6 +22,7 @@ import BridgeManagement from './BridgeManagement'
 import FundingPanel from './FundingPanel'
 import ExecutionLog from './ExecutionLog'
 import CustomFeedSetup from './CustomFeedSetup'
+import SourceVerification from './SourceVerification'
 import { 
   readAllChainlinkFeeds, 
   getHistoricalRounds,
@@ -371,6 +372,8 @@ const App: React.FC = () => {
       {activeTab === 'dashboard' && (
         <>
           <section style={{ marginBottom: '2rem' }}>
+            <SourceVerification />
+            
             <MultiFeedDisplay 
               prices={chainlinkPrices} 
               isLoading={isLoadingPrices}

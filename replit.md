@@ -45,6 +45,15 @@
 - **Execution Log**: Timeline view of relay executions, tx hashes with explorer links, gas usage, success/failure indicators
 - **Custom Feed Setup Wizard**: Add any Chainlink feed address, auto-detect metadata, popular feeds quick-select, deploy wizard
 
+### 7. Chainlink Source Verification (NEW - December 2025)
+- **Live Data Verified** badge with pulsing green indicator
+- Feed selector for ETH/USD, BTC/USD, LINK/USD
+- Oracle Contract address display
+- Latest Round ID and Answer (price)
+- Updated at timestamp (UTC)
+- Block Number reference
+- **Provenance Hash**: Keccak256(roundId + blockNumber + price) for data integrity verification
+
 ---
 
 ## Deployment Summary (PRODUCTION)
@@ -111,6 +120,7 @@ src/
 ├── FundingPanel.tsx          # Relayer funding status
 ├── ExecutionLog.tsx          # Relay execution history
 ├── CustomFeedSetup.tsx       # Custom feed deployment wizard
+├── SourceVerification.tsx    # Chainlink source verification box
 ├── contractInteraction.ts    # Wallet & contract logic
 ├── TerminalViewer.tsx        # Interactive terminal
 └── index.css                 # Styles with animations
