@@ -1,8 +1,8 @@
 const { ethers } = require('ethers');
 
 const LASNA_RPC = 'https://lasna-rpc.rnk.dev';
-const DESTINATION_PROXY = '0x02BE5025B416Ca3c7e2b5fbC6c9AbFe8669Ba574';
-const REACTOR = '0xe7d63C8dcfe109fc617DCcDe1799F38D13d17398';
+const DESTINATION_PROXY = '0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581';
+const REACTOR = '0x7d6a70f8303385D182ABAd16a8159B6A27FE6B25';
 
 const DESTINATION_ABI = [
   'function latestRoundData() external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)',

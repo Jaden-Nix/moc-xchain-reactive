@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 
-const NEW_ORIGIN_RELAY = '0xD200bD254a182aa0aa77d71C504189fb92481315';
+const NEW_ORIGIN_RELAY = '0xee481f6Fad0209880D61a072Ee7307CDC74dCDf8';
 const SEPOLIA_CHAIN_ID = 11155111;
 
 async function main() {

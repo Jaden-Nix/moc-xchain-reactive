@@ -100,7 +100,17 @@ contract OriginFeedRelay is Ownable, ReentrancyGuard {
             uint80 answeredInRound
         ) = priceFeed.latestRoundData();
         
-        if (roundId <= latestRoundId) revert InvalidRoundId();
+        // Allow relay if: new round OR first relay OR different updatedAt timestamp
+        bool isNewRound = roundId > latestRoundId;
+        bool isFirstRelay = latestRoundId == 0;
+        bool hasFreshTimestamp = (roundId == latestRoundId) && 
+            (updatedAt > priceUpdates[latestRoundId].updatedAt);
+        
+        // Skip silently if no new data (don't waste gas on revert)
+        if (!isNewRound && !isFirstRelay && !hasFreshTimestamp) {
+            return; // No new data to relay
+        }
+        
         if (updatedAt == 0) revert StaleUpdate();
         if (answer <= 0) revert InvalidPrice();
         if (block.timestamp - updatedAt > STALENESS_THRESHOLD) revert StaleUpdate();

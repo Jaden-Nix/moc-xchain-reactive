@@ -12,15 +12,15 @@ This deployment mirrors the **official Chainlink ETH/USD Price Feed** from Sepol
 
 | Contract | Address | Description |
 |----------|---------|-------------|
-| **OriginFeedRelay** | `0xD200bD254a182aa0aa77d71C504189fb92481315` | Reads from real Chainlink and emits relay events |
+| **OriginFeedRelay** | `0xee481f6Fad0209880D61a072Ee7307CDC74dCDf8` | Reads from real Chainlink and emits relay events |
 | **Chainlink ETH/USD** | `0x694AA1769357215DE4FAC081bf1f309aDC325306` | Official Chainlink Price Feed |
 
 ### Lasna (Reactive Network) - Chain ID: 5318007
 
 | Contract | Address | Description |
 |----------|---------|-------------|
-| **PriceFeedReactor** | `0xe7d63C8dcfe109fc617DCcDe1799F38D13d17398` | Listens to Sepolia events, triggers destination updates |
-| **DestinationFeedProxy** | `0x02BE5025B416Ca3c7e2b5fbC6c9AbFe8669Ba574` | Stores mirrored prices, AggregatorV3Interface compatible |
+| **PriceFeedReactor** | `0x7d6a70f8303385D182ABAd16a8159B6A27FE6B25` | Listens to Sepolia events, triggers destination updates |
+| **DestinationFeedProxy** | `0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581` | Stores mirrored prices, AggregatorV3Interface compatible |
 
 ---
 
@@ -41,12 +41,12 @@ SEPOLIA (Origin Chain)
       │
       └─→ LASNA (Reactive Network)
          │
-         ├─ PriceFeedReactor (0xe7d63C8dcfe109fc617DCcDe1799F38D13d17398)
+         ├─ PriceFeedReactor (0x7d6a70f8303385D182ABAd16a8159B6A27FE6B25)
          │  ├─ Subscribes to Sepolia OriginFeedRelay events
          │  ├─ Validates: confidence score, replay protection
          │  └─ Calls DestinationFeedProxy.updatePrice()
          │
-         └─ DestinationFeedProxy (0x02BE5025B416Ca3c7e2b5fbC6c9AbFe8669Ba574)
+         └─ DestinationFeedProxy (0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581)
             ├─ Stores all 7 fields from Chainlink
             ├─ AggregatorV3Interface compatible
             └─ Can be used by any downstream DApp on Lasna
@@ -108,9 +108,9 @@ The project includes a 24/7 automated relay worker that:
 
 ## Block Explorers
 
-- Sepolia OriginFeedRelay: https://sepolia.etherscan.io/address/0xD200bD254a182aa0aa77d71C504189fb92481315
-- Lasna PriceFeedReactor: https://lasna-scan.rkt.ink/address/0xe7d63C8dcfe109fc617DCcDe1799F38D13d17398
-- Lasna DestinationFeedProxy: https://lasna-scan.rkt.ink/address/0x02BE5025B416Ca3c7e2b5fbC6c9AbFe8669Ba574
+- Sepolia OriginFeedRelay: https://sepolia.etherscan.io/address/0xee481f6Fad0209880D61a072Ee7307CDC74dCDf8
+- Lasna PriceFeedReactor: https://lasna-scan.rkt.ink/address/0x7d6a70f8303385D182ABAd16a8159B6A27FE6B25
+- Lasna DestinationFeedProxy: https://lasna-scan.rkt.ink/address/0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581
 
 ---
 
