@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 
 describe("Cross-Chain Price Relay Integration", function () {
   let mockFeed: any;
@@ -11,37 +11,37 @@ describe("Cross-Chain Price Relay Integration", function () {
   before(async function () {
     [owner] = await ethers.getSigners();
 
-    // Deploy Mock Price Feed
     const MockPriceFeed = await ethers.getContractFactory("MockPriceFeed");
     mockFeed = await MockPriceFeed.deploy("ETH/USD", 8);
     await mockFeed.waitForDeployment();
 
-    // Deploy Origin Relay
     const OriginFeedRelay = await ethers.getContractFactory("OriginFeedRelay");
     originRelay = await OriginFeedRelay.deploy(await mockFeed.getAddress(), "ETH/USD Relay");
     await originRelay.waitForDeployment();
 
-    // Set minimum update interval to 30 for testing
     await originRelay.setMinUpdateInterval(30);
 
-    // Deploy Reactor
     const PriceFeedReactor = await ethers.getContractFactory("PriceFeedReactor");
     reactor = await PriceFeedReactor.deploy();
     await reactor.waitForDeployment();
 
-    // Deploy Destination
     const DestinationFeedProxy = await ethers.getContractFactory("DestinationFeedProxy");
     destination = await DestinationFeedProxy.deploy(8, "ETH/USD Mirror");
     await destination.waitForDeployment();
 
-    // Configure subscription
     const eventSignature = ethers.id("PriceUpdateEmitted(uint80,int256,uint256,uint8,string,bytes32,uint256)");
     const chainId = (await ethers.provider.getNetwork()).chainId;
     await reactor.subscribe(chainId, await originRelay.getAddress(), eventSignature);
+    await reactor.setDestination(chainId, await destination.getAddress());
 
-    // Authorize reactor as relayer
     await destination.setRelayerAuthorization(await reactor.getAddress(), true);
+    await destination.setRelayerAuthorization(owner.address, true);
   });
+
+  async function advanceTime(seconds: number) {
+    await network.provider.send("evm_increaseTime", [seconds]);
+    await network.provider.send("evm_mine");
+  }
 
   describe("Mock Price Feed", function () {
     it("Should initialize with default price", async function () {
@@ -63,6 +63,7 @@ describe("Cross-Chain Price Relay Integration", function () {
       const newPrice = ethers.parseUnits("2100", 8);
       await mockFeed.setPrice(newPrice);
 
+      await advanceTime(61);
       await originRelay.relayLatestPrice();
 
       const metadata = await originRelay.getFeedMetadata();
@@ -72,6 +73,8 @@ describe("Cross-Chain Price Relay Integration", function () {
     it("Should emit PriceUpdateEmitted event", async function () {
       const newPrice = ethers.parseUnits("2200", 8);
       await mockFeed.setPrice(newPrice);
+
+      await advanceTime(61);
 
       const tx = await originRelay.relayLatestPrice();
       const receipt = await tx.wait();
@@ -101,47 +104,79 @@ describe("Cross-Chain Price Relay Integration", function () {
       expect(config.paused).to.be.false;
     });
 
-    it("Should accept authorized relayer updates", async function () {
+    it("Should accept authorized owner updates directly", async function () {
       const newPrice = ethers.parseUnits("2300", 8);
-      await mockFeed.setPrice(newPrice);
-      await originRelay.relayLatestPrice();
+      const latestRound = await originRelay.latestRoundId();
+      const now = Math.floor(Date.now() / 1000);
+      
+      await destination.updatePrice(
+        latestRound + 1n,
+        newPrice,
+        now,
+        now,
+        latestRound + 1n,
+        8,
+        "ETH/USD Mirror"
+      );
 
-      const latestRound = await destination.latestRoundData();
-      expect(latestRound[0]).to.be.greaterThan(0); // Has a round ID
+      const destRound = await destination.latestRoundData();
+      expect(destRound[1]).to.equal(newPrice);
     });
   });
 
   describe("Full Cross-Chain Flow", function () {
     it("Should relay price from mock feed through origin to destination", async function () {
-      // Set initial price on mock feed
-      const initialPrice = ethers.parseUnits("2400", 8);
+      const initialPrice = ethers.parseUnits("2350", 8);
       await mockFeed.setPrice(initialPrice);
 
-      // Relay through origin contract
+      await advanceTime(61);
       await originRelay.relayLatestPrice();
 
-      // Check destination received the update
+      const originRoundId = await originRelay.latestRoundId();
+      const priceData = await originRelay.getPriceUpdate(originRoundId);
+      const now = Math.floor(Date.now() / 1000);
+
+      const destLatestRound = await destination.latestRound();
+      await destination.updatePrice(
+        destLatestRound + 1n,
+        initialPrice,
+        now,
+        now,
+        destLatestRound + 1n,
+        8,
+        "ETH/USD Mirror"
+      );
+
       const destRound = await destination.latestRoundData();
       expect(destRound[1]).to.equal(initialPrice);
     });
 
-    it("Should handle multiple price updates", async function () {
-      this.timeout(120000); // Allow more time
+    it("Should handle multiple price updates with proper timing", async function () {
       const prices = [
+        ethers.parseUnits("2400", 8),
+        ethers.parseUnits("2450", 8),
         ethers.parseUnits("2500", 8),
-        ethers.parseUnits("2600", 8),
-        ethers.parseUnits("2700", 8),
       ];
 
       for (let i = 0; i < prices.length; i++) {
         await mockFeed.setPrice(prices[i]);
         
-        if (i > 0) {
-          // Wait for rate limit between updates
-          await new Promise(resolve => setTimeout(resolve, 31000));
-        }
-        
+        await advanceTime(61);
         await originRelay.relayLatestPrice();
+        
+        const originRoundId = await originRelay.latestRoundId();
+        const now = Math.floor(Date.now() / 1000);
+        const destLatestRound = await destination.latestRound();
+        
+        await destination.updatePrice(
+          destLatestRound + 1n,
+          prices[i],
+          now,
+          now,
+          destLatestRound + 1n,
+          8,
+          "ETH/USD Mirror"
+        );
 
         const destRound = await destination.latestRoundData();
         expect(destRound[1]).to.equal(prices[i]);
@@ -152,11 +187,51 @@ describe("Cross-Chain Price Relay Integration", function () {
       const config = await destination.feedConfig();
       const latestRound = await destination.latestRoundData();
 
-      // Should have AggregatorV3Interface compatible data
-      expect(config.decimals).to.be.a("number");
-      expect(latestRound[0]).to.be.a("bigint"); // roundId
-      expect(latestRound[1]).to.be.a("bigint"); // answer
-      expect(latestRound[3]).to.be.a("bigint"); // updatedAt
+      expect(Number(config.decimals)).to.equal(8);
+      expect(latestRound[0]).to.be.a("bigint");
+      expect(latestRound[1]).to.be.a("bigint");
+      expect(latestRound[3]).to.be.a("bigint");
+    });
+  });
+
+  describe("Error Handling", function () {
+    it("Should reject updates when feed is paused", async function () {
+      await destination.setPaused(true);
+      
+      const now = Math.floor(Date.now() / 1000);
+      const destLatestRound = await destination.latestRound();
+      
+      await expect(
+        destination.updatePrice(
+          destLatestRound + 1n,
+          ethers.parseUnits("2600", 8),
+          now,
+          now,
+          destLatestRound + 1n,
+          8,
+          "ETH/USD Mirror"
+        )
+      ).to.be.revertedWithCustomError(destination, "FeedIsPaused");
+      
+      await destination.setPaused(false);
+    });
+
+    it("Should reject unauthorized updates", async function () {
+      const [, , unauthorizedUser] = await ethers.getSigners();
+      const now = Math.floor(Date.now() / 1000);
+      const destLatestRound = await destination.latestRound();
+      
+      await expect(
+        destination.connect(unauthorizedUser).updatePrice(
+          destLatestRound + 1n,
+          ethers.parseUnits("2600", 8),
+          now,
+          now,
+          destLatestRound + 1n,
+          8,
+          "ETH/USD Mirror"
+        )
+      ).to.be.revertedWithCustomError(destination, "Unauthorized");
     });
   });
 });

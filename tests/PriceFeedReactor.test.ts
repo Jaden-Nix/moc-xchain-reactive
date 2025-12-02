@@ -14,7 +14,7 @@ describe("PriceFeedReactor", function () {
     [owner, addr1] = await ethers.getSigners();
     
     const PriceFeedReactorFactory = await ethers.getContractFactory("PriceFeedReactor");
-    reactor = await PriceFeedReactorFactory.deploy();
+    reactor = await PriceFeedReactorFactory.deploy() as unknown as PriceFeedReactor;
     await reactor.waitForDeployment();
   });
 

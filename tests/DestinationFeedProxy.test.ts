@@ -15,7 +15,7 @@ describe("DestinationFeedProxy", function () {
     [owner, relayer, user] = await ethers.getSigners();
     
     const DestinationFeedProxyFactory = await ethers.getContractFactory("DestinationFeedProxy");
-    feedProxy = await DestinationFeedProxyFactory.deploy(decimals, description);
+    feedProxy = await DestinationFeedProxyFactory.deploy(decimals, description) as unknown as DestinationFeedProxy;
     await feedProxy.waitForDeployment();
     
     await feedProxy.setRelayerAuthorization(relayer.address, true);
