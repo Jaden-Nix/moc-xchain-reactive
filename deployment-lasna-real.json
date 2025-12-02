@@ -1,0 +1,11 @@
+{
+  "network": "lasna",
+  "chainId": 5318007,
+  "deployer": "0xe47Dce1b7e31333329734E24089C0472c030d95B",
+  "originRelay": "0xD200bD254a182aa0aa77d71C504189fb92481315",
+  "reactorAddress": "0xe7d63C8dcfe109fc617DCcDe1799F38D13d17398",
+  "destinationAddress": "0x02BE5025B416Ca3c7e2b5fbC6c9AbFe8669Ba574",
+  "reactorTxHash": "0x5cdc29b63cdd61de8e2695b6faf8fae6955b0c48b80bfb7498b10a0526d02ea7",
+  "destinationTxHash": "0xfc13b09b9767f20e5e997e54a03c5bb7f001d0a3077fd1b8a2f9224e248059ab",
+  "timestamp": "2025-12-02T16:29:50.019Z"
+}

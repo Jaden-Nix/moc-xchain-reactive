@@ -227,21 +227,25 @@ contract PriceFeedReactor is Ownable, ReentrancyGuard {
 
     /**
      * @notice Execute call to destination chain contract
-     * @dev This is a placeholder for actual cross-chain messaging
+     * @dev Makes actual call to DestinationFeedProxy on same chain
      */
     function _executeDestinationCall(PendingRelay memory relay) internal returns (bool) {
-        bytes memory payload = abi.encodeWithSignature(
-            "updatePrice(uint80,int256,uint256,uint256,uint80,uint8,string)",
-            relay.roundId,
-            relay.answer,
-            relay.updatedAt,
-            relay.updatedAt,
-            relay.roundId,
-            relay.decimals,
-            relay.description
+        if (destinationContract == address(0)) return false;
+        
+        (bool success, ) = destinationContract.call(
+            abi.encodeWithSignature(
+                "updatePrice(uint80,int256,uint256,uint256,uint80,uint8,string)",
+                relay.roundId,
+                relay.answer,
+                relay.updatedAt,
+                relay.updatedAt,
+                relay.roundId,
+                relay.decimals,
+                relay.description
+            )
         );
         
-        return true;
+        return success;
     }
 
     /**

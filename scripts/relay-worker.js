@@ -1,8 +1,14 @@
 const { ethers } = require('ethers');
 require('dotenv').config();
 
-const SEPOLIA_ORIGIN_RELAY = '0x46ad513300d508FB234fefD3ec1aB4162C547A57';
+const USE_REAL_CHAINLINK = process.env.USE_REAL_CHAINLINK === 'true';
+
+const SEPOLIA_ORIGIN_RELAY = USE_REAL_CHAINLINK 
+  ? '0xD200bD254a182aa0aa77d71C504189fb92481315'
+  : '0x46ad513300d508FB234fefD3ec1aB4162C547A57';
+
 const SEPOLIA_MOCK_FEED = '0xE293955c98D37044400E71c445062d7cd967250c';
+const REAL_CHAINLINK_ETH_USD = '0x694AA1769357215DE4FAC081bf1f309aDC325306';
 
 const RPC_ENDPOINTS = [
   process.env.SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com',
@@ -66,11 +72,12 @@ async function checkBalance(wallet) {
 }
 
 async function getCurrentPrice(provider) {
-  const mockFeed = new ethers.Contract(SEPOLIA_MOCK_FEED, AGGREGATOR_ABI, provider);
+  const feedAddress = USE_REAL_CHAINLINK ? REAL_CHAINLINK_ETH_USD : SEPOLIA_MOCK_FEED;
+  const feed = new ethers.Contract(feedAddress, AGGREGATOR_ABI, provider);
   try {
     const [roundData, decimals] = await Promise.all([
-      mockFeed.latestRoundData(),
-      mockFeed.decimals(),
+      feed.latestRoundData(),
+      feed.decimals(),
     ]);
     const price = Number(roundData[1]) / Math.pow(10, Number(decimals));
     return { price, roundId: roundData[0].toString(), rawPrice: roundData[1] };
@@ -187,12 +194,15 @@ async function runRelayLoop() {
         log('INFO', `Current price: $${priceInfo.price.toLocaleString()}`, { roundId: priceInfo.roundId });
       }
       
-      const mockUpdate = await updateMockPrice(wallet);
-      if (!mockUpdate.success) {
-        log('WARN', 'Failed to update mock price, trying relay anyway');
+      if (!USE_REAL_CHAINLINK) {
+        const mockUpdate = await updateMockPrice(wallet);
+        if (!mockUpdate.success) {
+          log('WARN', 'Failed to update mock price, trying relay anyway');
+        }
+        await sleep(2000);
+      } else {
+        log('INFO', 'Using REAL Chainlink feed - no mock updates needed');
       }
-      
-      await sleep(2000);
       
       const result = await relayPrice(wallet, relay);
       

@@ -1,0 +1,11 @@
+{
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployer": "0xe47Dce1b7e31333329734E24089C0472c030d95B",
+  "feed": "ETH/USD",
+  "chainlinkFeedAddress": "0x694AA1769357215DE4FAC081bf1f309aDC325306",
+  "originRelayAddress": "0xD200bD254a182aa0aa77d71C504189fb92481315",
+  "deployTxHash": "0x1db249a29c89f0be673de688c4fc90a1038fe177f968929cb8fef0276c9784bf",
+  "timestamp": "2025-12-02T16:17:49.052Z",
+  "currentPrice": 3013.4675
+}

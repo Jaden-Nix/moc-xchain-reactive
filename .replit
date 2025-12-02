@@ -116,3 +116,8 @@ channel = "stable-25_05"
 deploymentTarget = "autoscale"
 run = ["node", "api/index.js"]
 build = ["npm", "run", "build"]
+
+[userenv]
+
+[userenv.shared]
+USE_REAL_CHAINLINK = "true"

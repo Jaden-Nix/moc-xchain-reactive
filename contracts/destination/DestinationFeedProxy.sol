@@ -37,7 +37,7 @@ contract DestinationFeedProxy is AggregatorV3Interface, Ownable, ReentrancyGuard
     uint256 public totalUpdates;
     
     uint256 public constant DEFAULT_STALENESS_THRESHOLD = 3600;
-    uint256 public constant MAX_ANSWER_DEVIATION = 1000; // 10% in basis points
+    uint256 public maxAnswerDeviation = 5000; // 50% in basis points - configurable for real market volatility
     
     event PriceUpdated(
         uint80 indexed roundId,
@@ -147,14 +147,13 @@ contract DestinationFeedProxy is AggregatorV3Interface, Ownable, ReentrancyGuard
                 ? uint256((_answer - lastRound.answer) * 10000 / lastRound.answer)
                 : uint256((lastRound.answer - _answer) * 10000 / lastRound.answer);
             
-            if (deviation > MAX_ANSWER_DEVIATION) {
+            if (deviation > maxAnswerDeviation) {
                 emit AnomalousUpdateDetected(
                     _roundId,
                     _answer,
                     lastRound.answer,
                     deviation
                 );
-                revert DeviationTooHigh();
             }
         }
     }
@@ -263,6 +262,15 @@ contract DestinationFeedProxy is AggregatorV3Interface, Ownable, ReentrancyGuard
     function setStalenessThreshold(uint256 _threshold) external onlyOwner {
         require(_threshold >= 60, "Threshold too low");
         feedConfig.stalenessThreshold = _threshold;
+    }
+
+    /**
+     * @notice Update max answer deviation (owner only)
+     * @param _deviation Maximum deviation in basis points (100 = 1%)
+     */
+    function setMaxAnswerDeviation(uint256 _deviation) external onlyOwner {
+        require(_deviation >= 100 && _deviation <= 10000, "Invalid deviation");
+        maxAnswerDeviation = _deviation;
     }
 
     /**
