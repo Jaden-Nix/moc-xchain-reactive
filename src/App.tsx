@@ -17,6 +17,7 @@ import PriceChart from './PriceChart'
 import PerformanceMetrics from './PerformanceMetrics'
 import SecurityAudit from './SecurityAudit'
 import MultiFeedDisplay from './MultiFeedDisplay'
+import LasnaLiveDisplay from './LasnaLiveDisplay'
 import { 
   readAllChainlinkFeeds, 
   getHistoricalRounds,
@@ -195,14 +196,14 @@ const App: React.FC = () => {
       const deployment: DeploymentInfo = {
         sepolia: {
           mockFeed: '0xE293955c98D37044400E71c445062d7cd967250c',
-          originRelay: '0x46ad513300d508FB234fefD3ec1aB4162C547A57',
+          originRelay: '0xee481f6Fad0209880D61a072Ee7307CDC74dCDf8',
           realChainlinkEth: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
           realChainlinkBtc: '0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43',
           realChainlinkLink: '0xc59E3633BAAC79493d908e63626716e204A45EdF',
         },
         lasna: {
-          reactor: '0xE293955c98D37044400E71c445062d7cd967250c',
-          destination: '0x46ad513300d508FB234fefD3ec1aB4162C547A57',
+          reactor: '0x7d6a70f8303385D182ABAd16a8159B6A27FE6B25',
+          destination: '0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581',
         },
       }
 
@@ -365,6 +366,10 @@ const App: React.FC = () => {
               isLoading={isLoadingPrices}
               onRefresh={loadChainlinkPrices}
             />
+          </section>
+
+          <section style={{ marginBottom: '2rem' }}>
+            <LasnaLiveDisplay />
           </section>
 
           <section style={{ marginBottom: '2rem' }}>
