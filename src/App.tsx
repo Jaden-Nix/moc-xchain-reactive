@@ -18,6 +18,10 @@ import PerformanceMetrics from './PerformanceMetrics'
 import SecurityAudit from './SecurityAudit'
 import MultiFeedDisplay from './MultiFeedDisplay'
 import LasnaLiveDisplay from './LasnaLiveDisplay'
+import BridgeManagement from './BridgeManagement'
+import FundingPanel from './FundingPanel'
+import ExecutionLog from './ExecutionLog'
+import CustomFeedSetup from './CustomFeedSetup'
 import { 
   readAllChainlinkFeeds, 
   getHistoricalRounds,
@@ -80,7 +84,7 @@ const App: React.FC = () => {
   } | null>(null)
 
   const [testResults, setTestResults] = useState<TestResult[]>([])
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'info' | 'test' | 'audit'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'operations' | 'info' | 'test' | 'audit'>('dashboard')
   const [connectionError, setConnectionError] = useState<string | null>(null)
   const [isDeploying, setIsDeploying] = useState(false)
   const [deploymentMode, setDeploymentMode] = useState<'local' | 'testnet'>('testnet')
@@ -339,6 +343,12 @@ const App: React.FC = () => {
           📊 Live Dashboard
         </button>
         <button
+          className={`tab-btn ${activeTab === 'operations' ? 'active' : ''}`}
+          onClick={() => setActiveTab('operations')}
+        >
+          ⚙️ Operations
+        </button>
+        <button
           className={`tab-btn ${activeTab === 'info' ? 'active' : ''}`}
           onClick={() => setActiveTab('info')}
         >
@@ -533,6 +543,15 @@ const App: React.FC = () => {
               </div>
             )}
           </section>
+        </>
+      )}
+
+      {activeTab === 'operations' && (
+        <>
+          <BridgeManagement />
+          <FundingPanel />
+          <ExecutionLog />
+          <CustomFeedSetup />
         </>
       )}
 
