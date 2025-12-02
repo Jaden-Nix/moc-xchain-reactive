@@ -22,6 +22,7 @@ const ORIGIN_RELAY_ABI = [
 const AGGREGATOR_ABI = [
   'function latestRoundData() external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)',
   'function decimals() external view returns (uint8)',
+  'function setPrice(int256 _price) external',
 ];
 
 let currentRpcIndex = 0;
@@ -72,10 +73,42 @@ async function getCurrentPrice(provider) {
       mockFeed.decimals(),
     ]);
     const price = Number(roundData[1]) / Math.pow(10, Number(decimals));
-    return { price, roundId: roundData[0].toString() };
+    return { price, roundId: roundData[0].toString(), rawPrice: roundData[1] };
   } catch (error) {
     log('ERROR', 'Failed to read current price', { error: error.message });
     return null;
+  }
+}
+
+async function updateMockPrice(wallet) {
+  const mockFeed = new ethers.Contract(SEPOLIA_MOCK_FEED, AGGREGATOR_ABI, wallet);
+  
+  try {
+    const [roundData, decimals] = await Promise.all([
+      mockFeed.latestRoundData(),
+      mockFeed.decimals(),
+    ]);
+    
+    const currentPrice = Number(roundData[1]);
+    const variation = (Math.random() - 0.5) * 0.02;
+    const newPrice = Math.floor(currentPrice * (1 + variation));
+    
+    log('INFO', 'Updating MockPriceFeed with simulated price variation');
+    log('INFO', `Current: $${(currentPrice / 1e8).toFixed(2)} → New: $${(newPrice / 1e8).toFixed(2)}`);
+    
+    const tx = await mockFeed.setPrice(BigInt(newPrice));
+    log('INFO', 'MockPriceFeed update submitted', { hash: tx.hash });
+    
+    const receipt = await tx.wait();
+    log('INFO', 'MockPriceFeed updated successfully', { 
+      hash: receipt.hash,
+      gasUsed: receipt.gasUsed.toString()
+    });
+    
+    return { success: true, newPrice: newPrice / 1e8 };
+  } catch (error) {
+    log('ERROR', 'Failed to update MockPriceFeed', { error: error.message });
+    return { success: false };
   }
 }
 
@@ -153,6 +186,13 @@ async function runRelayLoop() {
       if (priceInfo) {
         log('INFO', `Current price: $${priceInfo.price.toLocaleString()}`, { roundId: priceInfo.roundId });
       }
+      
+      const mockUpdate = await updateMockPrice(wallet);
+      if (!mockUpdate.success) {
+        log('WARN', 'Failed to update mock price, trying relay anyway');
+      }
+      
+      await sleep(2000);
       
       const result = await relayPrice(wallet, relay);
       
