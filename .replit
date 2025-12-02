@@ -34,12 +34,12 @@ waitForPort = 5000
 name = "Price Relay Worker"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node scripts/relay-worker.js"
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "USE_REAL_CHAINLINK=true node scripts/relay-worker-multi.js"
 
 [[ports]]
 localPort = 3001

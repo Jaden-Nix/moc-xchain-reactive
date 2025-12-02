@@ -21,6 +21,8 @@ const LASNA_RPC = 'https://lasna-rpc.rnk.dev';
 
 const DESTINATION_CONTRACTS = {
   eth: '0x9Fd448E930cE937d8dDCdF6e4F5bE8B9C6aF3581',
+  btc: '0x3C828678De4F4184952D66f2d0260B5db2e0f522',
+  link: '0x3E6114bdd39db5c624C67FbCEDe7B3053E621915',
 };
 
 const DESTINATION_ABI = [
@@ -75,10 +77,16 @@ export function LasnaLiveDisplay() {
       const block = await provider.getBlockNumber();
       setLasnaBlock(block);
       
-      const ethData = await fetchDestinationData(DESTINATION_CONTRACTS.eth);
+      const [ethData, btcData, linkData] = await Promise.all([
+        fetchDestinationData(DESTINATION_CONTRACTS.eth),
+        fetchDestinationData(DESTINATION_CONTRACTS.btc),
+        fetchDestinationData(DESTINATION_CONTRACTS.link),
+      ]);
       
       setFeedData({
         eth: ethData || undefined,
+        btc: btcData || undefined,
+        link: linkData || undefined,
       });
       setLastRefresh(new Date());
     } catch (error) {
@@ -145,6 +153,20 @@ export function LasnaLiveDisplay() {
             title="ETH/USD"
             data={feedData.eth}
             contractAddress={DESTINATION_CONTRACTS.eth}
+            getStatusColor={getStatusColor}
+            getStatusText={getStatusText}
+          />
+          <FeedCard 
+            title="BTC/USD"
+            data={feedData.btc}
+            contractAddress={DESTINATION_CONTRACTS.btc}
+            getStatusColor={getStatusColor}
+            getStatusText={getStatusText}
+          />
+          <FeedCard 
+            title="LINK/USD"
+            data={feedData.link}
+            contractAddress={DESTINATION_CONTRACTS.link}
             getStatusColor={getStatusColor}
             getStatusText={getStatusText}
           />
