@@ -37,28 +37,49 @@ async function fetchDestinationData(contractAddress: string): Promise<Destinatio
     const provider = new ethers.JsonRpcProvider(LASNA_RPC);
     const contract = new ethers.Contract(contractAddress, DESTINATION_ABI, provider);
     
-    const [roundId, answer, , updatedAt] = await contract.latestRoundData();
-    const decimals = await contract.decimals();
-    let description = 'ETH/USD';
+    let decimals = 8;
+    try {
+      decimals = Number(await contract.decimals());
+    } catch {}
+    
+    let description = 'Price Feed';
     try {
       description = await contract.description();
     } catch {}
     
-    const priceNum = Number(answer) / Math.pow(10, Number(decimals));
-    const updatedAtNum = Number(updatedAt);
-    const now = Math.floor(Date.now() / 1000);
-    const age = now - updatedAtNum;
-    
-    return {
-      roundId: roundId.toString(),
-      price: answer.toString(),
-      priceFormatted: `$${priceNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`,
-      updatedAt: updatedAt.toString(),
-      updatedAtFormatted: new Date(updatedAtNum * 1000).toLocaleString(),
-      decimals: Number(decimals),
-      description,
-      status: age < 300 ? 'live' : age < 3600 ? 'stale' : 'no_data',
-    };
+    try {
+      const [roundId, answer, , updatedAt] = await contract.latestRoundData();
+      
+      const priceNum = Number(answer) / Math.pow(10, decimals);
+      const updatedAtNum = Number(updatedAt);
+      const now = Math.floor(Date.now() / 1000);
+      const age = now - updatedAtNum;
+      
+      return {
+        roundId: roundId.toString(),
+        price: answer.toString(),
+        priceFormatted: `$${priceNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 3 })}`,
+        updatedAt: updatedAt.toString(),
+        updatedAtFormatted: new Date(updatedAtNum * 1000).toLocaleString(),
+        decimals,
+        description,
+        status: age < 300 ? 'live' : age < 3600 ? 'stale' : 'no_data',
+      };
+    } catch (latestError: any) {
+      if (latestError.message?.includes('InvalidRoundId') || latestError.data === '0xbfbe031f') {
+        return {
+          roundId: '0',
+          price: '0',
+          priceFormatted: 'Awaiting Reactive Network',
+          updatedAt: '0',
+          updatedAtFormatted: 'Pending cross-chain relay',
+          decimals,
+          description,
+          status: 'no_data',
+        };
+      }
+      throw latestError;
+    }
   } catch (error) {
     return null;
   }
@@ -249,10 +270,12 @@ function FeedCard({ title, data, contractAddress, getStatusColor, getStatusText 
         </>
       ) : (
         <div style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
-          <div style={{ fontSize: '40px', marginBottom: '10px' }}>⏳</div>
-          <div>Waiting for first price relay...</div>
-          <div style={{ fontSize: '12px', marginTop: '8px', color: '#666' }}>
-            The Reactive Network is processing cross-chain events
+          <div style={{ fontSize: '40px', marginBottom: '10px' }}>🔄</div>
+          <div style={{ marginBottom: '8px' }}>Awaiting Reactive Network</div>
+          <div style={{ fontSize: '12px', color: '#666', lineHeight: '1.5' }}>
+            Events emitted on Sepolia<br/>
+            Reactive Network will detect and relay<br/>
+            <span style={{ color: '#ffaa00' }}>This can take 1-10+ minutes</span>
           </div>
         </div>
       )}
