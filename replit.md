@@ -39,6 +39,12 @@
 - Severity classification (Critical, High, Medium, Low)
 - Overall security score visualization
 
+### 6. Operations Tab (NEW - December 2025)
+- **Bridge Management View**: Status badges (green/yellow/red), staleness detection, gas balance monitoring
+- **Funding Panel**: Real-time balance tracking, gas cost estimates, projected days of operation, low balance alerts
+- **Execution Log**: Timeline view of relay executions, tx hashes with explorer links, gas usage, success/failure indicators
+- **Custom Feed Setup Wizard**: Add any Chainlink feed address, auto-detect metadata, popular feeds quick-select, deploy wizard
+
 ---
 
 ## Deployment Summary (PRODUCTION)
@@ -100,6 +106,11 @@ src/
 ├── PerformanceMetrics.tsx    # Performance metrics display
 ├── SecurityAudit.tsx         # Security audit report
 ├── MultiFeedDisplay.tsx      # Multi-feed price display
+├── LasnaLiveDisplay.tsx      # Lasna destination feed display
+├── BridgeManagement.tsx      # Bridge health monitoring
+├── FundingPanel.tsx          # Relayer funding status
+├── ExecutionLog.tsx          # Relay execution history
+├── CustomFeedSetup.tsx       # Custom feed deployment wizard
 ├── contractInteraction.ts    # Wallet & contract logic
 ├── TerminalViewer.tsx        # Interactive terminal
 └── index.css                 # Styles with animations
@@ -110,6 +121,10 @@ contracts/
 ├── reactive/PriceFeedReactor.sol
 └── destination/DestinationFeedProxy.sol
 
+scripts/
+├── relay-worker-multi.js     # 24/7 multi-feed relay worker
+└── deploy/                   # Deployment scripts
+
 api/
 └── index.js                  # Terminal API server
 ```
@@ -118,10 +133,11 @@ api/
 
 ## Dashboard Tabs
 
-1. **Live Dashboard** - Real-time Chainlink prices, charts, metrics
-2. **Deployment** - Contract addresses and transaction hashes
-3. **Tests** - Interactive contract testing
-4. **Security Audit** - Comprehensive security report
+1. **Live Dashboard** - Real-time Chainlink prices, charts, Lasna destination data
+2. **Operations** - Bridge management, funding status, execution log, custom feed setup
+3. **Deployment** - Contract addresses and transaction hashes
+4. **Tests** - Interactive contract testing
+5. **Security Audit** - Comprehensive security report
 
 ---
 
@@ -155,11 +171,14 @@ npm run compile      # Compile contracts
 4. **Performance Metrics** - Real-time system health monitoring
 5. **Security Audit** - Professional-grade security documentation
 6. **Production Ready** - Full testnet deployment verified
+7. **Operations Dashboard** - Bridge management, funding, execution logs
+8. **Custom Feed Support** - Add any Chainlink feed with auto-detection
+9. **24/7 Relay Worker** - Automated multi-feed relay every 90 seconds
 
 ---
 
 **Status: READY FOR SUBMISSION**
-Last Updated: December 2025
+Last Updated: December 2, 2025
 
 ---
 
